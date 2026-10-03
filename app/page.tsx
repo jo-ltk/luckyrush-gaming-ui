@@ -169,7 +169,7 @@ function Sidebar() {
   const [active, setActive] = useState('Home')
 
   return (
-    <aside className="fixed bottom-0 left-0 top-[76px] z-20 flex w-[264px] flex-col border-r border-white/[.08] bg-[#08051A] px-3 py-6">
+    <aside className="fixed bottom-0 left-0 top-[80px] z-20 flex w-[264px] flex-col border-r border-white/[.08] bg-[#08051A] px-3 py-6 max-h-[calc(100vh-80px)] overflow-y-auto">
       <div className="flex flex-col gap-[3px]">
         {navPrimary.map(item => (
           <NavItem key={item.label} item={item} active={active === item.label} onSelect={() => setActive(item.label)} />
@@ -181,7 +181,8 @@ function Sidebar() {
           <NavItem key={item.label} item={item} active={active === item.label} onSelect={() => setActive(item.label)} />
         ))}
       </div>
-      <div className="group relative mt-auto min-h-[262px] overflow-hidden rounded-[15px] border border-[#29204A] bg-[#100D27] shadow-[0_8px_30px_rgba(0,0,0,.25)] transition-all duration-300 hover:border-[#7138A8]/60 hover:shadow-[0_8px_35px_rgba(123,58,237,.18)]">
+      <div className="flex-1 min-h-[20px]" />
+      <div className="group relative min-h-[262px] overflow-hidden rounded-[15px] border border-[#29204A] bg-[#100D27] shadow-[0_8px_30px_rgba(0,0,0,.25)] transition-all duration-300 hover:border-[#7138A8]/60 hover:shadow-[0_8px_35px_rgba(123,58,237,.18)]">
         <Image
           src="/vip-club-golden-crown.png"
           alt=""
@@ -353,12 +354,7 @@ function LatestWins() {
   }, [])
 
   return (
-    <motion.section
-      initial={{ opacity: 0, x: 18 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.45, delay: 0.18 }}
-      className="w-full h-[458px] rounded-2xl border border-white/[.08] bg-white/[.035] p-4 overflow-hidden"
-    >
+    <section className="w-full flex-shrink-0 rounded-2xl border border-white/[.08] bg-white/[.035] p-4">
       <div className="mb-4 flex items-center justify-between">
         <div>
           <p className="text-[14px] font-bold uppercase tracking-[.2em] text-fuchsia-300">
@@ -375,7 +371,7 @@ function LatestWins() {
         </button>
       </div>
 
-      <div className="flex flex-col gap-2.5 overflow-hidden">
+      <div className="flex flex-col gap-2">
         <AnimatePresence initial={false}>
           {displayWins.map((win: DisplayWin, index: number) => (
             <motion.div
@@ -462,21 +458,16 @@ function LatestWins() {
           ))}
         </AnimatePresence>
       </div>
-    </motion.section>
+    </section>
   )
 }
 
 function MiniGameCenter() {
   return (
-    <motion.section
-      initial={{ opacity: 0, x: 18 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.45, delay: 0.24 }}
-      className="flex min-h-0 w-full flex-1 flex-col"
-    >
+    <section className="flex flex-col flex-shrink-0">
       <p className="mb-1 px-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p>
-      <LuckyMatchGame className="flex-1" />
-    </motion.section>
+      <LuckyMatchGame />
+    </section>
   )
 }
 
@@ -567,7 +558,7 @@ function GameCard({ game }: { game: Game }) {
   )
 }
 
-function MobileHeader() { return <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[#08051A]/95 px-4 py-3 backdrop-blur-xl"><LuckyRushLogo height={36} className="h-9 w-[107px]" /><div className="flex items-center gap-1.5"><div className="rounded-lg border border-amber-400/20 bg-amber-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-amber-300">GC</span> 25,600</div><div className="rounded-lg border border-emerald-400/20 bg-emerald-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-emerald-300">SC</span> 12.50</div><button aria-label="Notifications" className="flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[.04] text-slate-300"><Bell className="size-4" /></button></div></header> }
+function MobileHeader() { return <header className="sticky top-4 z-40 flex items-center justify-between border-b border-white/10 bg-[#08051A]/95 px-4 py-3 backdrop-blur-xl"><LuckyRushLogo height={36} className="h-9 w-[107px]" /><div className="flex items-center gap-1.5"><div className="rounded-lg border border-amber-400/20 bg-amber-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-amber-300">GC</span> 25,600</div><div className="rounded-lg border border-emerald-400/20 bg-emerald-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-emerald-300">SC</span> 12.50</div><button aria-label="Notifications" className="flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[.04] text-slate-300"><Bell className="size-4" /></button></div></header> }
 
 function MobileQuickNav() { const items = [{ label: 'Home', icon: Home }, { label: 'Slots', icon: Zap }, { label: 'Live Casino', icon: Sparkles }, { label: 'Table Games', icon: Trophy }, { label: 'Promotions', icon: Gift }, { label: 'Search', icon: Search }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-bold', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white' : 'border-white/10 bg-white/[.03] text-slate-400')}><Icon className="size-5" />{label}</button>)}</nav> }
 
@@ -761,8 +752,8 @@ export default function Page() {
     <main
       className="
         relative
-        min-h-screen
-        overflow-x-hidden
+        h-screen
+        overflow-hidden
         bg-[#05040F]
         text-white
         selection:bg-violet-500/30
@@ -826,259 +817,256 @@ export default function Page() {
         <Navbar />
         <Sidebar />
 
-        <div className="ml-[264px] min-h-screen pt-[76px]">
-          <div className="flex min-h-[calc(100vh-76px)] w-full flex-col px-4 py-4 xl:px-6 xl:py-5">
-            <div className="grid flex-1 grid-cols-[minmax(0,1fr)_280px] lg:grid-cols-[minmax(0,1fr)_295px] xl:grid-cols-[minmax(0,1fr)_315px] 2xl:grid-cols-[minmax(0,1fr)_335px] items-stretch gap-4 xl:gap-5">
+        {/* RIGHT SIDEBAR - FIXED */}
+        <aside className="fixed bottom-0 right-0 top-[80px] z-20 flex w-[280px] flex-col border-l border-white/[.08] bg-[#08051A] px-3 lg:w-[295px] xl:w-[315px] 2xl:w-[335px] max-h-[calc(100vh-80px)] overflow-y-auto">
+          <div className="flex flex-col gap-4">
+            <LatestWins />
+            <MiniGameCenter />
+          </div>
+        </aside>
+
+        <div className="ml-[264px] mr-[280px] h-screen pt-[80px] lg:mr-[295px] xl:mr-[315px] 2xl:mr-[335px]">
+          <div className="flex h-[calc(100vh-80px)] w-full flex-col px-4 py-4 xl:px-6 xl:py-5 overflow-y-auto">
+
+            {/* ================================================= */}
+            {/* MAIN CONTENT */}
+            {/* ================================================= */}
+
+            <div className="flex min-h-0 flex-1 flex-col justify-between gap-4 xl:gap-5">
+
+              {/* HERO */}
+              <Hero />
+
+              {/* PROMO CARDS */}
+              <PromoCards />
 
               {/* ================================================= */}
-              {/* MAIN CONTENT */}
+              {/* GAME LOBBY */}
               {/* ================================================= */}
 
-              <div className="flex h-full min-w-0 flex-col justify-between gap-4 xl:gap-5">
+              <section className="relative">
+                <div className="relative z-10 mb-3 flex items-center gap-3">
+                  <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                    {filters.map(({ label, icon: Icon, iconClass }) => {
+                      const active = filter === label
 
-                {/* HERO */}
-                <Hero />
-
-                {/* PROMO CARDS */}
-                <PromoCards />
-
-                {/* ================================================= */}
-                {/* GAME LOBBY */}
-                {/* ================================================= */}
-
-                <section className="relative">
-                  <div className="relative z-10 mb-3 flex items-center gap-3">
-                    <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                      {filters.map(({ label, icon: Icon, iconClass }) => {
-                        const active = filter === label
-
-                        return (
-                          <button
-                            key={label}
-                            type="button"
-                            onClick={() => setFilter(label)}
-                            className={cn(
-                              'flex h-[38px] shrink-0 items-center gap-1.5 rounded-full px-[14px] text-[13px] font-bold tracking-[-0.01em] transition-all duration-200',
-                              active
-                                ? 'bg-gradient-to-r from-[#7B3CFF] via-[#9B45F0] to-[#C44BFF] text-white shadow-[0_0_18px_rgba(168,85,247,.38)]'
-                                : 'border border-white/[0.12] bg-[#16122C]/85 text-[#D4D0E4] hover:border-white/20 hover:bg-[#1C1836] hover:text-white',
-                            )}
-                          >
-                            <Icon
-                              className={cn('size-[15px] shrink-0', active ? 'text-white' : iconClass)}
-                              strokeWidth={active ? 2.2 : 1.9}
-                            />
-                            {label}
-                          </button>
-                        )
-                      })}
-                    </div>
-
-                    <button
-                      type="button"
-                      className="flex shrink-0 items-center gap-1 text-[13px] font-bold text-[#B7B3C9] transition-colors hover:text-white"
-                    >
-                      View All Games
-                      <ChevronRight className="size-4" />
-                    </button>
+                      return (
+                        <button
+                          key={label}
+                          type="button"
+                          onClick={() => setFilter(label)}
+                          className={cn(
+                            'flex h-[38px] shrink-0 items-center gap-1.5 rounded-full px-[14px] text-[13px] font-bold tracking-[-0.01em] transition-all duration-200',
+                            active
+                              ? 'bg-gradient-to-r from-[#7B3CFF] via-[#9B45F0] to-[#C44BFF] text-white shadow-[0_0_18px_rgba(168,85,247,.38)]'
+                              : 'border border-white/[0.12] bg-[#16122C]/85 text-[#D4D0E4] hover:border-white/20 hover:bg-[#1C1836] hover:text-white',
+                          )}
+                        >
+                          <Icon
+                            className={cn('size-[15px] shrink-0', active ? 'text-white' : iconClass)}
+                            strokeWidth={active ? 2.2 : 1.9}
+                          />
+                          {label}
+                        </button>
+                      )
+                    })}
                   </div>
 
-                  <motion.div
-                    layout
-                    className="relative z-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 xl:gap-3.5"
+                  <button
+                    type="button"
+                    className="flex shrink-0 items-center gap-1 text-[13px] font-bold text-[#B7B3C9] transition-colors hover:text-white"
                   >
-                    {visible.map(game => (
-                      <GameCard
-                        key={game.name}
-                        game={game}
-                      />
-                    ))}
-                  </motion.div>
-                </section>
+                    View All Games
+                    <ChevronRight className="size-4" />
+                  </button>
+                </div>
 
-                {/* ================================================= */}
-                {/* WELCOME BONUS */}
-                {/* ================================================= */}
+                <motion.div
+                  layout
+                  className="relative z-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 xl:gap-3.5"
+                >
+                  {visible.map(game => (
+                    <GameCard
+                      key={game.name}
+                      game={game}
+                    />
+                  ))}
+                </motion.div>
+              </section>
 
-                <section
+              {/* ================================================= */}
+              {/* WELCOME BONUS */}
+              {/* ================================================= */}
+
+              <section
+                className="
+                  group
+                  relative
+                  flex
+                  flex-1
+                  min-h-[165px]
+                  flex-col
+                  justify-center
+                  overflow-hidden
+                  rounded-[18px]
+                  border
+                  border-[#43226A]
+                  bg-[#120B25]
+                  shadow-[0_10px_35px_rgba(0,0,0,.2)]
+                "
+              >
+                {/* Background image */}
+                <Image
+                  src="/welcome-bonus-gift-coins.png"
+                  alt=""
+                  fill
                   className="
-                    group
+                    object-cover
+                    object-left
+                    transition-transform
+                    duration-700
+                    group-hover:scale-[1.025]
+                  "
+                />
+
+                {/* Main overlay */}
+                <div
+                  className="
+                    absolute
+                    inset-0
+                    bg-gradient-to-r
+                    from-[#12091F]/10
+                    via-[#12091F]/45
+                    to-[#12091F]/90
+                  "
+                />
+
+                {/* Purple glow */}
+                <div
+                  className="
+                    pointer-events-none
+                    absolute
+                    right-[20%]
+                    top-1/2
+                    h-32
+                    w-52
+                    -translate-y-1/2
+                    rounded-full
+                    bg-violet-500/[.08]
+                    blur-[55px]
+                  "
+                />
+
+                {/* Content */}
+                <div
+                  className="
                     relative
+                    z-10
                     flex
-                    flex-1
+                    h-full
+                    w-full
                     min-h-[165px]
-                    flex-col
-                    justify-center
-                    overflow-hidden
-                    rounded-[18px]
-                    border
-                    border-[#43226A]
-                    bg-[#120B25]
-                    shadow-[0_10px_35px_rgba(0,0,0,.2)]
+                    items-center
+                    px-8
+                    py-5
                   "
                 >
-                  {/* Background image */}
-                  <Image
-                    src="/welcome-bonus-gift-coins.png"
-                    alt=""
-                    fill
-                    className="
-                      object-cover
-                      object-left
-                      transition-transform
-                      duration-700
-                      group-hover:scale-[1.025]
-                    "
-                  />
+                  {/* RIGHT CONTENT */}
+                  <div className="flex flex-col items-end ml-auto">
+                    <p
+                      className="
+                        text-[11px]
+                        font-bold
+                        uppercase
+                        tracking-[.2em]
+                        text-fuchsia-300
+                      "
+                    >
+                      A little something extra
+                    </p>
 
-                  {/* Main overlay */}
-                  <div
-                    className="
-                      absolute
-                      inset-0
-                      bg-gradient-to-r
-                      from-[#12091F]/10
-                      via-[#12091F]/45
-                      to-[#12091F]/90
-                    "
-                  />
+                    <h2
+                      className="mt-1 whitespace-nowrap bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-[32px] font-black leading-[0.92] tracking-tight text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] lg:text-[58px] xl:text-[62px]"
+                    >
+                      WELCOME BONUS
+                    </h2>
 
-                  {/* Purple glow */}
-                  <div
-                    className="
-                      pointer-events-none
-                      absolute
-                      right-[20%]
-                      top-1/2
-                      h-32
-                      w-52
-                      -translate-y-1/2
-                      rounded-full
-                      bg-violet-500/[.08]
-                      blur-[55px]
-                    "
-                  />
+                    <p
+                      className="
+                        mt-2
+                        max-w-[220px]
+                        text-[13px]
+                        leading-5
+                        text-slate-300
+                        lg:text-[15px]
+                      "
+                    >
+                      Sign up now and get{' '}
+                      <strong className="text-[#F4C84E]">
+                        FREE COINS
+                      </strong>{' '}
+                      to start playing!
+                    </p>
 
-                  {/* Content */}
-                  <div
-                    className="
-                      relative
-                      z-10
-                      flex
-                      h-full
-                      w-full
-                      min-h-[165px]
-                      items-center
-                      px-8
-                      py-5
-                    "
-                  >
-                    {/* RIGHT CONTENT */}
-                    <div className="flex flex-col items-end ml-auto">
-                      <p
+                    <div className="mt-5 flex gap-3">
+                      <button
+                        type="button"
                         className="
-                          text-[11px]
+                          flex
+                          h-[48px]
+                          items-center
+                          justify-center
+                          rounded-[12px]
+                          border
+                          border-amber-400/30
+                          bg-gradient-to-r
+                          from-amber-500
+                          to-yellow-400
+                          px-6
+                          text-[12px]
                           font-bold
                           uppercase
-                          tracking-[.2em]
-                          text-fuchsia-300
+                          tracking-widest
+                          text-[#1a0a00]
+                          shadow-[0_0_18px_rgba(251,191,36,.25)]
+                          transition-all
+                          hover:brightness-110
+                          hover:shadow-[0_0_25px_rgba(251,191,36,.38)]
                         "
                       >
-                        A little something extra
-                      </p>
-
-                      <h2
-                        className="mt-1 whitespace-nowrap bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-[32px] font-black leading-[0.92] tracking-tight text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] lg:text-[58px] xl:text-[62px]"
-                      >
-                        WELCOME BONUS
-                      </h2>
-
-                      <p
+                        Claim Reward
+                      </button>
+                      <button
+                        type="button"
                         className="
-                          mt-2
-                          max-w-[220px]
-                          text-[13px]
-                          leading-5
-                          text-slate-300
-                          lg:text-[15px]
+                          flex
+                          h-[48px]
+                          items-center
+                          justify-center
+                          rounded-[12px]
+                          border
+                          border-white/20
+                          bg-white/10
+                          px-6
+                          text-[12px]
+                          font-bold
+                          uppercase
+                          tracking-widest
+                          text-white
+                          backdrop-blur
+                          transition-all
+                          hover:bg-white/15
+                          hover:border-white/30
                         "
                       >
-                        Sign up now and get{' '}
-                        <strong className="text-[#F4C84E]">
-                          FREE COINS
-                        </strong>{' '}
-                        to start playing!
-                      </p>
-
-                      <div className="mt-5 flex gap-3">
-                        <button
-                          type="button"
-                          className="
-                            flex
-                            h-[48px]
-                            items-center
-                            justify-center
-                            rounded-[12px]
-                            border
-                            border-amber-400/30
-                            bg-gradient-to-r
-                            from-amber-500
-                            to-yellow-400
-                            px-6
-                            text-[12px]
-                            font-bold
-                            uppercase
-                            tracking-widest
-                            text-[#1a0a00]
-                            shadow-[0_0_18px_rgba(251,191,36,.25)]
-                            transition-all
-                            hover:brightness-110
-                            hover:shadow-[0_0_25px_rgba(251,191,36,.38)]
-                          "
-                        >
-                          Claim Reward
-                        </button>
-                        <button
-                          type="button"
-                          className="
-                            flex
-                            h-[48px]
-                            items-center
-                            justify-center
-                            rounded-[12px]
-                            border
-                            border-white/20
-                            bg-white/10
-                            px-6
-                            text-[12px]
-                            font-bold
-                            uppercase
-                            tracking-widest
-                            text-white
-                            backdrop-blur
-                            transition-all
-                            hover:bg-white/15
-                            hover:border-white/30
-                          "
-                        >
-                          Learn More
-                        </button>
-                      </div>
+                        Learn More
+                      </button>
                     </div>
                   </div>
-                </section>
-              </div>
-
-              {/* ================================================= */}
-              {/* RIGHT SIDE — LATEST WINS */}
-              {/* ================================================= */}
-
-              <aside className="flex h-full min-w-0 flex-col justify-between gap-4 xl:gap-5">
-                <LatestWins />
-                <MiniGameCenter />
-              </aside>
-
+                </div>
+              </section>
             </div>
+
           </div>
         </div>
       </div>

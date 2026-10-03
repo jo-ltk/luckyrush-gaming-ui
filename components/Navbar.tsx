@@ -135,7 +135,7 @@ export function Navbar() {
       className="
         fixed
         inset-x-0
-        top-0
+        top-4
         z-30
         h-[76px]
         border-b

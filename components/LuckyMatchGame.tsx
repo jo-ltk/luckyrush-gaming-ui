@@ -5,8 +5,8 @@ import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
-type SymbolId = 'crown' | 'diamond' | 'gift' | 'seven' | 'star' | 'coin' | 'chest' | 'clover'
-const SYMBOLS: SymbolId[] = ['crown', 'diamond', 'gift', 'seven', 'star', 'coin', 'chest', 'clover']
+type SymbolId = 'crown' | 'diamond' | 'gift' | 'seven' | 'star' | 'coin' | 'emerald' | 'chest' | 'clover'
+const SYMBOLS: SymbolId[] = ['crown', 'diamond', 'gift', 'seven', 'star', 'coin', 'emerald', 'chest', 'clover']
 
 const REWARDS: Record<SymbolId, string> = {
   crown: '+250,000 GC',
@@ -15,6 +15,7 @@ const REWARDS: Record<SymbolId, string> = {
   seven: '+75,000 GC',
   star: '+10,000 GC',
   coin: '+5,000 GC',
+  emerald: '+15,000 GC',
   chest: '+50,000 GC',
   clover: '+500 SC',
 }
@@ -158,6 +159,30 @@ function buildStrip(tail: SymbolId[], final: SymbolId, i: number): SymbolId[] {
 }
 
 function Gem({ id, className = '', uid }: { id: SymbolId; className?: string; uid: string }) {
+  if (id === 'coin') {
+    return (
+      <Image
+        src="/golden-crown-coin.png"
+        alt="Coin"
+        width={64}
+        height={64}
+        className={className}
+      />
+    )
+  }
+
+  if (id === 'emerald') {
+    return (
+      <Image
+        src="/emerald-crown-coin.png"
+        alt="Emerald"
+        width={64}
+        height={64}
+        className={className}
+      />
+    )
+  }
+
   const g = (k: string) => `${uid}-${id}-${k}`
   const u = (k: string) => `url(#${g(k)})`
   return (
@@ -220,13 +245,6 @@ function Gem({ id, className = '', uid }: { id: SymbolId; className?: string; ui
       )}
       {id === 'star' && (
         <path d="M32 5 L40 24 L60 25 L44 38 L49 58 L32 46 L15 58 L20 38 L4 25 L24 24 Z" fill={u('blue')} stroke="#CFE6FF" strokeWidth="1.8" strokeLinejoin="round" />
-      )}
-      {id === 'coin' && (
-        <g>
-          <circle cx="32" cy="32" r="27" fill={u('gold')} stroke="#FFF6C2" strokeWidth="2" />
-          <circle cx="32" cy="32" r="20" fill="none" stroke="#A8680B" strokeOpacity=".7" strokeWidth="2" />
-          <path d="M20 40 L22 28 L28 34 L32 24 L36 34 L42 28 L44 40 Z" fill="#FFF3B0" />
-        </g>
       )}
       {id === 'chest' && (
         <g strokeLinejoin="round">
@@ -355,8 +373,8 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
   const win = result === 'win'
 
   return (
-    <section className={`flex h-full min-h-0 w-full flex-col ${className}`.trim()} aria-label="Lucky Match mini-game">
-      <div className="relative w-full shrink-0" style={{ aspectRatio: '1065 / 1477' }}>
+    <section className={`flex w-full flex-col overflow-hidden ${className}`.trim()} aria-label="Lucky Match mini-game">
+      <div className="relative w-full shrink-0" style={{ height: '560px' }}>
         <div
           className="absolute overflow-hidden rounded-[12%]"
           style={{ left: '15.4%', width: '69.3%', top: '30.1%', height: '40.6%' }}
