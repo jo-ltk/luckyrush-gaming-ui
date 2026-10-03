@@ -5,8 +5,9 @@ import Image from 'next/image'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   Bell, ChevronRight, CircleHelp, Crown, Flame, Gamepad2, Gem, Gift, Heart, Home, LayoutGrid,
-  LifeBuoy, Menu, Search, ShieldCheck, Sparkles, Star, TrendingUp, Trophy, Zap,
+  Menu, Search, ShieldCheck, Sparkles, Star, TrendingUp, Trophy, X, Zap,
 } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 import { LuckyMatchGame } from '@/components/LuckyMatchGame'
 import { LuckyRushLogo, Navbar } from '@/components/Navbar'
 import { SparkleBadge } from '@/components/SparkleBadge'
@@ -20,7 +21,6 @@ import {
   useCategoryFilterAnimation,
   useSidebarMenuItemAnimation,
   useHeroMotion,
-  animateLiveWin,
   createSparkBurst,
   animateRewardCounter,
   showRewardPopup,
@@ -105,7 +105,7 @@ function NavItem({
   active = false,
   onSelect,
 }: {
-  item: typeof navPrimary[number]
+  item: { label: string; icon: LucideIcon }
   active?: boolean
   onSelect?: () => void
 }) {
@@ -120,20 +120,18 @@ function NavItem({
       onClick={onSelect}
       className={cn(
         'group relative flex h-[58px] w-full cursor-pointer items-center gap-[22px] rounded-[14px] px-[22px] text-left text-[15px] font-bold transition-all duration-300',
-        active && 'overflow-hidden border border-[#B84DFF]/55 bg-gradient-to-r from-[#8F32E8] via-[#6523B7] to-[#32145F] text-white shadow-[0_0_18px_rgba(153,51,238,.28)]',
-        !active && 'border border-transparent text-[#A9A9BC] hover:bg-white/[0.035] hover:text-[#E8E4F3]',
+        active &&
+          'overflow-hidden border border-[#B84DFF]/55 bg-gradient-to-r from-[#8F32E8] via-[#6523B7] to-[#32145F] text-white shadow-[0_0_18px_rgba(153,51,238,.28)]',
+        !active &&
+          'border border-transparent text-[#A9A9BC] hover:bg-white/[0.035] hover:text-[#E8E4F3]',
       )}
     >
       {active && (
-        <span
-          className="pointer-events-none absolute left-0 top-1/2 h-[42px] w-[3px] -translate-y-1/2 rounded-r-full bg-[#E765FF] shadow-[0_0_10px_3px_rgba(231,101,255,.65)]"
-        />
+        <span className="pointer-events-none absolute left-0 top-1/2 h-[42px] w-[3px] -translate-y-1/2 rounded-r-full bg-[#E765FF] shadow-[0_0_10px_3px_rgba(231,101,255,.65)]" />
       )}
 
       {active && (
-        <span
-          className="pointer-events-none absolute inset-[1px] rounded-[13px] border border-white/[0.08]"
-        />
+        <span className="pointer-events-none absolute inset-[1px] rounded-[13px] border border-white/[0.08]" />
       )}
 
       <Icon
@@ -151,23 +149,41 @@ function NavItem({
   )
 }
 
-function Sidebar() {
-  const [active, setActive] = useState('Home')
-
+function SidebarContent({
+  active,
+  onSelect,
+}: {
+  active: string
+  onSelect: (label: string) => void
+}) {
   return (
-    <aside className="fixed bottom-0 left-0 top-[68px] z-20 flex w-[264px] flex-col border-r border-white/[.08] bg-[#08051A] px-3 py-6 max-h-[calc(100vh-68px)] overflow-y-auto">
+    <div className="flex min-h-full flex-col">
       <div className="flex flex-col gap-[3px]">
         {navPrimary.map(item => (
-          <NavItem key={item.label} item={item} active={active === item.label} onSelect={() => setActive(item.label)} />
+          <NavItem
+            key={item.label}
+            item={item}
+            active={active === item.label}
+            onSelect={() => onSelect(item.label)}
+          />
         ))}
       </div>
+
       <div className="my-5 h-px bg-white/[.08]" />
+
       <div className="flex flex-col gap-[3px]">
         {navSecondary.map(item => (
-          <NavItem key={item.label} item={item} active={active === item.label} onSelect={() => setActive(item.label)} />
+          <NavItem
+            key={item.label}
+            item={item}
+            active={active === item.label}
+            onSelect={() => onSelect(item.label)}
+          />
         ))}
       </div>
+
       <div className="flex-1 min-h-[20px]" />
+
       <div className="group relative min-h-[262px] overflow-hidden rounded-[15px] border border-[#29204A] bg-[#100D27] shadow-[0_8px_30px_rgba(0,0,0,.25)] transition-all duration-300 hover:border-[#7138A8]/60 hover:shadow-[0_8px_35px_rgba(123,58,237,.18)]">
         <Image
           src="/vip-club-golden-crown.png"
@@ -177,15 +193,18 @@ function Sidebar() {
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#100D27]/90" />
         <div className="pointer-events-none absolute left-1/2 top-[35px] h-[100px] w-[150px] -translate-x-1/2 rounded-full bg-[#8B35E8]/10 blur-[40px]" />
+
         <div className="relative z-10 flex h-full min-h-[262px] flex-col items-start justify-end px-5 pb-5">
           <p className="text-[18px] font-bold leading-none tracking-[-0.02em] text-[#FFE45C] drop-shadow-[0_1px_8px_rgba(255,214,50,.25)]">
             Join Our VIP Club
           </p>
+
           <p className="mt-2 text-[14px] font-normal leading-[21px] text-[#D4D0E2]">
             Unlock exclusive rewards
             <br />
             and special perks!
           </p>
+
           <button
             type="button"
             className="mt-5 flex h-[55px] w-full cursor-pointer items-center justify-between rounded-[14px] border border-[#913AFF] bg-gradient-to-r from-[#241044] to-[#3A1768] px-5 text-[14px] font-bold text-white shadow-[0_0_12px_rgba(145,58,255,.18),inset_0_1px_0_rgba(255,255,255,.08)] transition-all duration-300 hover:border-[#B55AFF] hover:from-[#2D1255] hover:to-[#491B7D] hover:shadow-[0_0_22px_rgba(168,85,247,.32)]"
@@ -195,7 +214,102 @@ function Sidebar() {
           </button>
         </div>
       </div>
+    </div>
+  )
+}
+
+function Sidebar() {
+  const [active, setActive] = useState('Home')
+
+  return (
+    <aside className="fixed bottom-0 left-0 top-[68px] z-20 flex w-[264px] flex-col overflow-y-auto border-r border-white/[.08] bg-[#08051A] px-3 py-6 overscroll-contain">
+      <SidebarContent
+        active={active}
+        onSelect={label => setActive(label)}
+      />
     </aside>
+  )
+}
+
+function MobileSidebarDrawer({
+  open,
+  active,
+  onClose,
+  onSelect,
+}: {
+  open: boolean
+  active: string
+  onClose: () => void
+  onSelect: (label: string) => void
+}) {
+  useEffect(() => {
+    if (!open) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [open, onClose])
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          <motion.button
+            type="button"
+            aria-label="Close menu"
+            className="fixed inset-0 z-[90] bg-black/65 backdrop-blur-[2px] md:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={onClose}
+          />
+
+          <motion.aside
+            role="dialog"
+            aria-modal="true"
+            aria-label="LuckyRush menu"
+            className="fixed inset-y-0 left-0 z-[100] flex w-[min(86vw,320px)] flex-col overflow-y-auto overscroll-contain border-r border-white/[.08] bg-[#08051A] px-3 pb-6 pt-4 shadow-[20px_0_60px_rgba(0,0,0,.45)] md:hidden"
+            initial={{ x: '-100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '-100%' }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="mb-4 flex items-center justify-between border-b border-white/[.08] pb-3">
+              <LuckyRushLogo height={34} className="h-8 w-[96px]" />
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={onClose}
+                className="flex size-9 items-center justify-center rounded-xl border border-white/10 bg-white/[.04] text-slate-300 transition hover:bg-white/[.08] hover:text-white"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <SidebarContent
+              active={active}
+              onSelect={label => {
+                onSelect(label)
+                onClose()
+              }}
+            />
+          </motion.aside>
+        </>
+      )}
+    </AnimatePresence>
   )
 }
 
@@ -406,7 +520,7 @@ function LatestWins() {
   }, [])
 
   return (
-    <section className="w-full flex-shrink-0 rounded-2xl border border-white/[.08] bg-white/[.035] p-4 overflow-hidden" style={{ height: '480px' }}>
+    <section className="w-full flex-shrink-0 overflow-hidden rounded-2xl border border-white/[.08] bg-white/[.035] p-4 md:h-[480px]">
       <div className="mb-4 flex items-center justify-between flex-shrink-0">
         <div>
           <p className="text-[14px] font-bold uppercase tracking-[.2em] text-fuchsia-300">
@@ -455,7 +569,7 @@ function LatestWins() {
                 },
               }}
               className={cn(
-                'relative flex items-center gap-2.5 rounded-xl border border-white/[.05] bg-black/20 p-2 h-14 flex-shrink-0',
+                'relative flex h-14 flex-shrink-0 items-center gap-2.5 rounded-xl border border-white/[.05] bg-black/20 p-2',
                 index === 0 &&
                   'shadow-[0_0_18px_rgba(217,70,239,.12)]'
               )}
@@ -660,6 +774,43 @@ function GameCard({ game }: { game: Game }) {
   )
 }
 
+function CategoryFilterButton({
+  label,
+  Icon,
+  iconClass,
+  active,
+  onClick,
+}: {
+  label: string
+  Icon: LucideIcon
+  iconClass: string
+  active: boolean
+  onClick: () => void
+}) {
+  const buttonRef = useRef<HTMLButtonElement>(null)
+  useCategoryFilterAnimation(buttonRef, active)
+
+  return (
+    <button
+      ref={buttonRef}
+      type="button"
+      onClick={onClick}
+      className={cn(
+        'flex h-[38px] shrink-0 items-center gap-1.5 rounded-full px-[14px] text-[13px] font-bold tracking-[-0.01em] transition-all duration-200',
+        active
+          ? 'bg-gradient-to-r from-[#7B3CFF] via-[#9B45F0] to-[#C44BFF] text-white shadow-[0_0_18px_rgba(168,85,247,.38)]'
+          : 'border border-white/[0.12] bg-[#16122C]/85 text-[#D4D0E4] hover:border-white/20 hover:bg-[#1C1836] hover:text-white',
+      )}
+    >
+      <Icon
+        className={cn('size-[15px] shrink-0', active ? 'text-white' : iconClass)}
+        strokeWidth={active ? 2.2 : 1.9}
+      />
+      {label}
+    </button>
+  )
+}
+
 function MobileHeader() { return <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[#08051A]/95 px-4 py-3 backdrop-blur-xl"><LuckyRushLogo height={36} className="h-9 w-[107px]" /><div className="flex items-center gap-1.5"><div className="rounded-lg border border-amber-400/20 bg-amber-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-amber-300">GC</span> 25,600</div><div className="rounded-lg border border-emerald-400/20 bg-emerald-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-emerald-300">SC</span> 12.50</div><button aria-label="Notifications" className="flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[.04] text-slate-300"><Bell className="size-4" /></button></div></header> }
 
 function MobileQuickNav() { const items = [{ label: 'Home', icon: Home, color: 'text-fuchsia-400' }, { label: 'Slots', icon: Zap, color: 'text-amber-400' }, { label: 'Live Casino', icon: Sparkles, color: 'text-cyan-400' }, { label: 'Table Games', icon: Trophy, color: 'text-yellow-400' }, { label: 'Promotions', icon: Gift, color: 'text-pink-400' }, { label: 'Search', icon: Search, color: 'text-slate-400' }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon, color }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-bold transition-all duration-300', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white shadow-[0_0_15px_rgba(217,70,239,.25)]' : 'border-white/10 bg-white/[.03] text-slate-400 hover:border-white/20 hover:bg-white/[.06]')}><Icon className={cn('size-5', index === 0 ? 'text-fuchsia-300 drop-shadow-[0_0_8px_rgba(217,70,239,.5)]' : color)} />{label}</button>)}</nav> }
@@ -722,6 +873,7 @@ function MobilePromos() {
     { title: 'Daily Rewards', text: 'Claim every day', icon: Gift, background: '/daily-rewards-banner.png', accent: 'gold', align: 'right' },
     { title: 'New Games', text: 'Fresh experiences', icon: Sparkles, background: '/new-games-banner.png', accent: 'cyan', align: 'left' },
     { title: 'Free-to-Play', text: 'Play with GC & SC', icon: Zap, background: '/free-to-play-banner.png', accent: 'gold', align: 'right' },
+    { title: 'VIP Club', text: 'Exclusive rewards', icon: Crown, background: '/vip-club-golden-crown.png', accent: 'gold', align: 'right' },
   ]
   return (
     <div className="flex gap-3 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -777,53 +929,250 @@ function MobilePromos() {
 
 function MobileGameSection({ title, games: sectionGames }: { title: string; games: Game[] }) { return <section className="flex flex-col gap-3"><div className="flex items-center justify-between px-4"><h2 className="text-lg font-bold text-white">{title}</h2><button className="text-[11px] font-bold text-fuchsia-300">View All</button></div><div className="flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{sectionGames.map(game => <div key={game.name} className="w-[142px] shrink-0"><GameCard game={game} /></div>)}</div></section> }
 
-function MobileBottomNav({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) {
+function MobileBottomNav({
+  activeTab,
+  onTabChange,
+  onMore,
+  menuOpen,
+}: {
+  activeTab: string
+  onTabChange: (tab: string) => void
+  onMore: () => void
+  menuOpen: boolean
+}) {
   const items = [
     { label: 'Home', icon: Home, color: 'text-fuchsia-400' },
     { label: 'Games', icon: LayoutGrid, color: 'text-cyan-400' },
     { label: 'Rewards', icon: Crown, color: 'text-amber-400' },
     { label: 'Promotions', icon: Gift, color: 'text-pink-400' },
-    { label: 'More', icon: Menu, color: 'text-slate-400' }
+    { label: 'More', icon: Menu, color: 'text-slate-400' },
   ]
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-50 flex h-[68px] items-end justify-around border-t border-white/10 bg-[#08051A]/95 px-2 pb-2 pt-1 backdrop-blur-xl">
-      {items.map(({ label, icon: Icon, color }) => (
-        <button
-          key={label}
-          onClick={() => setActiveTab(label)}
-          className={cn(
-            'flex min-w-[56px] flex-col items-center gap-1 rounded-xl px-2 py-1 text-[10px] font-bold transition-all duration-300',
-            activeTab === label
-              ? 'bg-gradient-to-t from-fuchsia-600 to-violet-600 text-white shadow-[0_0_20px_rgba(217,70,239,.45)]'
-              : 'text-slate-500 hover:text-slate-300'
-          )}
-        >
-          <Icon className={cn('size-5', activeTab === label ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,.3)]' : color)} />
-          {label}
-        </button>
-      ))}
+    <nav className="fixed inset-x-0 bottom-0 z-50 flex h-[68px] items-end justify-around border-t border-white/10 bg-[#08051A]/95 px-2 pb-2 pt-1 backdrop-blur-xl md:hidden">
+      {items.map(({ label, icon: Icon, color }) => {
+        const active = label === 'More' ? menuOpen : activeTab === label
+
+        return (
+          <button
+            key={label}
+            type="button"
+            aria-label={label === 'More' ? 'Open menu' : label}
+            aria-expanded={label === 'More' ? menuOpen : undefined}
+            onClick={() => {
+              if (label === 'More') {
+                onMore()
+                return
+              }
+
+              onTabChange(label)
+            }}
+            className={cn(
+              'flex min-w-[56px] flex-col items-center gap-1 rounded-xl px-2 py-1 text-[10px] font-bold transition-all duration-300',
+              active
+                ? 'bg-gradient-to-t from-fuchsia-600 to-violet-600 text-white shadow-[0_0_20px_rgba(217,70,239,.45)]'
+                : 'text-slate-500 hover:text-slate-300',
+            )}
+          >
+            <Icon
+              className={cn(
+                'size-5',
+                active
+                  ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,.3)]'
+                  : color,
+              )}
+            />
+            {label}
+          </button>
+        )
+      })}
     </nav>
   )
 }
 
 function MobileLobby() {
   const [activeTab, setActiveTab] = useState('Home')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [activeMenuItem, setActiveMenuItem] = useState('Home')
+
+  const homeRef = useRef<HTMLDivElement>(null)
+  const gamesRef = useRef<HTMLElement>(null)
+  const promosRef = useRef<HTMLDivElement>(null)
+  const rewardsRef = useRef<HTMLElement>(null)
+
+  const scrollTo = (target: HTMLElement | null) => {
+    target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  const handleBottomTab = (tab: string) => {
+    setActiveTab(tab)
+
+    if (tab === 'Home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    if (tab === 'Games') {
+      scrollTo(gamesRef.current)
+    }
+
+    if (tab === 'Rewards') {
+      scrollTo(rewardsRef.current)
+    }
+
+    if (tab === 'Promotions') {
+      scrollTo(promosRef.current)
+    }
+  }
+
+  const handleMenuSelect = (label: string) => {
+    setActiveMenuItem(label)
+
+    const targets: Record<string, HTMLElement | null> = {
+      Home: homeRef.current,
+      Slots: gamesRef.current,
+      'All Games': gamesRef.current,
+      'Table Games': gamesRef.current,
+      'Live Casino': gamesRef.current,
+      'New Games': gamesRef.current,
+      Promotions: promosRef.current,
+      'Daily Rewards': rewardsRef.current,
+      'VIP Club': rewardsRef.current,
+      Favorites: gamesRef.current,
+      'Help Center': homeRef.current,
+    }
+
+    scrollTo(targets[label] ?? homeRef.current)
+  }
 
   return (
-    <div className="flex flex-col gap-5 pb-24 md:hidden">
+    <div ref={homeRef} className="flex min-h-screen flex-col gap-5 pb-24 md:hidden">
       <MobileHeader />
+
+      <MobileSidebarDrawer
+        open={menuOpen}
+        active={activeMenuItem}
+        onClose={() => setMenuOpen(false)}
+        onSelect={handleMenuSelect}
+      />
+
       <MobileHero />
       <MobileQuickNav />
-      <MobilePromos />
-      <div className="px-8">
-        <p className="mb-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p>
-        <LuckyMatchGame />
+
+      <div ref={promosRef}>
+        <MobilePromos />
       </div>
-      <MobileGameSection title="Popular Games" games={games.slice(0, 6)} />
-      <MobileGameSection title="Featured Slots" games={games.slice(6, 12)} />
-      <MobileGameSection title="Live Casino" games={games.slice(2, 8)} />
-      <MobileBottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+
+      <section className="px-4">
+        <div className="mb-3 flex items-center justify-between">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">
+              Live activity
+            </p>
+            <h2 className="mt-1 text-lg font-bold text-white">Latest Wins</h2>
+          </div>
+        </div>
+
+        <LatestWins />
+      </section>
+
+      <div className="px-4">
+        <MiniGameCenter />
+      </div>
+
+      <section ref={gamesRef} className="flex flex-col gap-5 scroll-mt-4">
+        <div className="flex items-center gap-3 px-4">
+          <div className="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {[
+              { label: 'For You', icon: Flame, iconClass: 'text-white' },
+              { label: 'Trending', icon: TrendingUp, iconClass: 'text-[#C9C6D8]' },
+              { label: 'New Games', icon: Star, iconClass: 'text-[#C9C6D8]' },
+              { label: 'Jackpots', icon: Crown, iconClass: 'text-[#F0C14B]' },
+              { label: 'Popular', icon: Gamepad2, iconClass: 'text-[#C9C6D8]' },
+              { label: 'Hold & Win', icon: Gem, iconClass: 'text-[#D7D3EA]' },
+              { label: 'Slots', icon: Zap, iconClass: 'text-[#E8C15A]' },
+              { label: 'Live Casino', icon: Sparkles, iconClass: 'text-[#C9B6FF]' },
+              { label: 'Table Games', icon: Trophy, iconClass: 'text-[#F0C14B]' },
+            ].map(({ label, icon: Icon, iconClass }) => (
+              <CategoryFilterButton
+                key={label}
+                label={label}
+                Icon={Icon}
+                iconClass={iconClass}
+                active={activeMenuItem === label}
+                onClick={() => setActiveMenuItem(label)}
+              />
+            ))}
+          </div>
+        </div>
+
+        <MobileGameSection title="Popular Games" games={games.slice(0, 6)} />
+        <MobileGameSection title="Featured Slots" games={games.slice(6, 12)} />
+        <MobileGameSection title="Live Casino" games={games.slice(2, 8)} />
+        <MobileGameSection title="New Games" games={games.slice(0, 6)} />
+      </section>
+
+      <section
+        ref={rewardsRef}
+        className="group relative mx-4 min-h-[180px] scroll-mt-4 overflow-hidden rounded-[18px] border border-[#43226A] bg-[#120B25] shadow-[0_10px_35px_rgba(0,0,0,.25)]"
+      >
+        <Image
+          src="/welcome-bonus-gift-coins.png"
+          alt=""
+          fill
+          sizes="calc(100vw - 32px)"
+          className="object-cover object-left transition-transform duration-700 group-hover:scale-[1.025]"
+        />
+
+        <div className="absolute inset-0 bg-gradient-to-r from-[#12091F]/20 via-[#12091F]/60 to-[#12091F]/95" />
+
+        <div className="pointer-events-none absolute right-[10%] top-1/2 h-28 w-40 -translate-y-1/2 rounded-full bg-violet-500/[.10] blur-[45px]" />
+
+        <div className="relative z-10 flex min-h-[180px] w-full items-center justify-end px-4 py-5">
+          <div className="flex w-full flex-col items-end text-right">
+            <p className="text-[9px] font-bold uppercase tracking-[.16em] text-fuchsia-300">
+              A little something extra
+            </p>
+
+            <h2 className="mt-1 whitespace-nowrap bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-[25px] font-black leading-[0.92] tracking-tight text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)]">
+              WELCOME BONUS
+            </h2>
+
+            <div className="mt-4 flex w-full justify-end gap-2">
+              <button
+                type="button"
+                onClick={(e) => {
+                  showRewardPopup('+100,000 GC', document.body, e.clientX, e.clientY)
+                  createSparkBurst({
+                    x: e.clientX,
+                    y: e.clientY,
+                    count: 15,
+                    size: 5,
+                  })
+                }}
+                className="flex h-[40px] items-center justify-center rounded-[11px] border border-amber-400/30 bg-gradient-to-r from-amber-500 to-yellow-400 px-3 text-[10px] font-bold uppercase tracking-[.12em] text-[#1a0a00] shadow-[0_0_18px_rgba(251,191,36,.25)] transition-all hover:brightness-110 hover:shadow-[0_0_25px_rgba(251,191,36,.38)]"
+              >
+                Claim Reward
+              </button>
+
+              <button
+                type="button"
+                className="flex h-[40px] items-center justify-center rounded-[11px] border border-white/20 bg-white/10 px-3 text-[10px] font-bold uppercase tracking-[.12em] text-white backdrop-blur transition-all hover:border-white/30 hover:bg-white/15"
+              >
+                Learn More
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+
+      <MobileBottomNav
+        activeTab={activeTab}
+        onTabChange={handleBottomTab}
+        onMore={() => setMenuOpen(value => !value)}
+        menuOpen={menuOpen}
+      />
     </div>
   )
 }
@@ -929,8 +1278,8 @@ export default function Page() {
           </div>
         </aside>
 
-        <div className="ml-[264px] mr-[280px] min-h-screen pt-[68px] lg:mr-[295px] xl:mr-[315px] 2xl:mr-[335px]">
-          <div className="flex h-[calc(100vh-68px)] w-full flex-col px-4 py-4 xl:px-6 xl:py-5 overflow-y-auto">
+        <div className="ml-[264px] mr-[280px] h-screen overflow-hidden pt-[68px] lg:mr-[295px] xl:mr-[315px] 2xl:mr-[335px]">
+          <div className="flex h-full min-h-0 w-full flex-col overflow-y-auto overscroll-contain px-4 py-4 xl:px-6 xl:py-5">
 
             {/* ================================================= */}
             {/* MAIN CONTENT */}
@@ -951,32 +1300,16 @@ export default function Page() {
               <section className="relative">
                 <div className="relative z-10 mb-3 flex items-center gap-3">
                   <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    {filters.map(({ label, icon: Icon, iconClass }) => {
-                      const active = filter === label
-                      const buttonRef = useRef<HTMLButtonElement>(null)
-                      useCategoryFilterAnimation(buttonRef, active)
-
-                      return (
-                        <button
-                          key={label}
-                          ref={buttonRef}
-                          type="button"
-                          onClick={() => setFilter(label)}
-                          className={cn(
-                            'flex h-[38px] shrink-0 items-center gap-1.5 rounded-full px-[14px] text-[13px] font-bold tracking-[-0.01em] transition-all duration-200',
-                            active
-                              ? 'bg-gradient-to-r from-[#7B3CFF] via-[#9B45F0] to-[#C44BFF] text-white shadow-[0_0_18px_rgba(168,85,247,.38)]'
-                              : 'border border-white/[0.12] bg-[#16122C]/85 text-[#D4D0E4] hover:border-white/20 hover:bg-[#1C1836] hover:text-white',
-                          )}
-                        >
-                          <Icon
-                            className={cn('size-[15px] shrink-0', active ? 'text-white' : iconClass)}
-                            strokeWidth={active ? 2.2 : 1.9}
-                          />
-                          {label}
-                        </button>
-                      )
-                    })}
+                    {filters.map(({ label, icon: Icon, iconClass }) => (
+                      <CategoryFilterButton
+                        key={label}
+                        label={label}
+                        Icon={Icon}
+                        iconClass={iconClass}
+                        active={filter === label}
+                        onClick={() => setFilter(label)}
+                      />
+                    ))}
                   </div>
 
                   <button
