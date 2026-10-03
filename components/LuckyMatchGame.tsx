@@ -4,6 +4,8 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { useSpinButtonAnimation, createSparkBurst, createCoinBurst, animateRewardCounter } from '@/lib/gsap-animations'
+import gsap from 'gsap'
 
 type SymbolId = 'crown' | 'diamond' | 'gift' | 'seven' | 'star' | 'coin' | 'emerald' | 'chest' | 'clover'
 const SYMBOLS: SymbolId[] = ['crown', 'diamond', 'gift', 'seven', 'star', 'coin', 'emerald', 'chest', 'clover']
@@ -85,23 +87,16 @@ const RECENT_WINS: RecentWin[] = [
   },
 ]
 
-function easeOutCubic(t: number): number {
-  return 1 - Math.pow(1 - t, 3)
-}
-
 function AnimatedWinAmount({ amount, winId, isNew }: { amount: string; winId: string; isNew: boolean }) {
-  const [displayedAmount, setDisplayedAmount] = useState(amount)
+  const elementRef = useRef<HTMLSpanElement>(null)
   const animatedIds = useRef<Set<string>>(new Set())
-  const lastUpdateTime = useRef(0)
 
   useEffect(() => {
-    if (!isNew) {
-      setDisplayedAmount(amount)
+    if (!isNew || !elementRef.current) {
       return
     }
 
     if (animatedIds.current.has(winId)) {
-      setDisplayedAmount(amount)
       return
     }
 
@@ -111,34 +106,11 @@ function AnimatedWinAmount({ amount, winId, isNew }: { amount: string; winId: st
     animatedIds.current.add(winId)
     const [, prefix, numericStr, suffix] = match
     const targetValue = parseInt(numericStr.replace(/,/g, ''), 10)
-    const startValue = 0
-    const duration = 600
-    const startTime = performance.now()
-    const throttleMs = 33
 
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime
-      const progress = Math.min(elapsed / duration, 1)
-      const easedProgress = easeOutCubic(progress)
-      const currentValue = Math.floor(startValue + (targetValue - startValue) * easedProgress)
-      const formattedValue = currentValue.toLocaleString()
-
-      if (currentTime - lastUpdateTime.current > throttleMs) {
-        setDisplayedAmount(`${prefix}${formattedValue} ${suffix}`)
-        lastUpdateTime.current = currentTime
-      }
-
-      if (progress < 1) {
-        requestAnimationFrame(animate)
-      } else {
-        setDisplayedAmount(`${prefix}${formattedValue} ${suffix}`)
-      }
-    }
-
-    requestAnimationFrame(animate)
+    animateRewardCounter(elementRef.current, targetValue, 0.8, prefix, ` ${suffix}`)
   }, [amount, winId, isNew])
 
-  return <>{displayedAmount}</>
+  return <span ref={elementRef}>{amount}</span>
 }
 
 const rand = () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]
@@ -159,30 +131,6 @@ function buildStrip(tail: SymbolId[], final: SymbolId, i: number): SymbolId[] {
 }
 
 function Gem({ id, className = '', uid }: { id: SymbolId; className?: string; uid: string }) {
-  if (id === 'coin') {
-    return (
-      <Image
-        src="/golden-crown-coin.png"
-        alt="Coin"
-        width={64}
-        height={64}
-        className={className}
-      />
-    )
-  }
-
-  if (id === 'emerald') {
-    return (
-      <Image
-        src="/emerald-crown-coin.png"
-        alt="Emerald"
-        width={64}
-        height={64}
-        className={className}
-      />
-    )
-  }
-
   const g = (k: string) => `${uid}-${id}-${k}`
   const u = (k: string) => `url(#${g(k)})`
   return (
@@ -211,6 +159,10 @@ function Gem({ id, className = '', uid }: { id: SymbolId; className?: string; ui
         <linearGradient id={g('wood')} x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stopColor="#C0713A" />
           <stop offset="1" stopColor="#6B3414" />
+        </linearGradient>
+        <linearGradient id={g('emerald')} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#50FFC8" />
+          <stop offset="1" stopColor="#00B85C" />
         </linearGradient>
       </defs>
       {id === 'crown' && (
@@ -246,6 +198,20 @@ function Gem({ id, className = '', uid }: { id: SymbolId; className?: string; ui
       {id === 'star' && (
         <path d="M32 5 L40 24 L60 25 L44 38 L49 58 L32 46 L15 58 L20 38 L4 25 L24 24 Z" fill={u('blue')} stroke="#CFE6FF" strokeWidth="1.8" strokeLinejoin="round" />
       )}
+      {id === 'coin' && (
+        <g strokeLinejoin="round">
+          <circle cx="32" cy="32" r="24" fill={u('gold')} stroke="#FFF6C2" strokeWidth="2" />
+          <circle cx="32" cy="32" r="20" fill="none" stroke="#FFE27A" strokeWidth="1.5" />
+          <text x="32" y="38" textAnchor="middle" fontSize="20" fontWeight="bold" fill="#FFE27A">$</text>
+        </g>
+      )}
+      {id === 'emerald' && (
+        <g strokeLinejoin="round">
+          <path d="M32 8 L52 24 L44 56 L20 56 L12 24 Z" fill={u('emerald')} stroke="#A0FFD8" strokeWidth="1.5" />
+          <path d="M32 8 L52 24 M32 8 L12 24 M52 24 L44 56 M12 24 L20 56 M20 56 L44 56" fill="none" stroke="#fff" strokeOpacity=".5" strokeWidth="1" />
+          <path d="M32 8 L32 56" fill="none" stroke="#fff" strokeOpacity=".3" strokeWidth="1" />
+        </g>
+      )}
       {id === 'chest' && (
         <g strokeLinejoin="round">
           <path d="M8 30 C8 14 56 14 56 30 Z" fill={u('wood')} stroke="#FFD27A" strokeWidth="1.5" />
@@ -272,6 +238,8 @@ const PCOL = ['#FFD84D', '#FF4DD8', '#8A5BFF', '#4DB8FF']
 
 export function LuckyMatchGame({ className = '' }: { className?: string }) {
   const uid = useId().replace(/:/g, '')
+  const spinButtonRef = useRef<HTMLButtonElement>(null)
+  useSpinButtonAnimation(spinButtonRef)
   const [strips, setStrips] = useState<SymbolId[][]>(() =>
     [0, 1, 2].map((i) => Array.from({ length: VISIBLE }, (_, k) => SYMBOLS[(i * 3 + k * 2) % SYMBOLS.length])),
   )
@@ -282,12 +250,11 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
   const [reward, setReward] = useState<string | null>(null)
   const [particles, setParticles] = useState<Particle[]>([])
   const timers = useRef<number[]>([])
-  const autoSpinInterval = useRef<number | null>(null)
   const [recentWins, setRecentWins] = useState<RecentWin[]>(RECENT_WINS)
   useEffect(() => () => timers.current.forEach(window.clearTimeout), [])
-  useEffect(() => () => { if (autoSpinInterval.current) window.clearInterval(autoSpinInterval.current) }, [])
 
   const spin = useCallback(() => {
+    if (spinning) return
     setSpinning(true)
     setResult(null)
     setReward(null)
@@ -298,7 +265,7 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
     setMoving([true, true, true])
     requestAnimationFrame(() => requestAnimationFrame(() => setRunning([true, true, true])))
 
-    final.forEach((_, i) => {
+    final.forEach((_, i: number) => {
       timers.current.push(
         window.setTimeout(() => {
           setMoving((m) => m.map((v, k) => (k === i ? false : v)))
@@ -306,7 +273,7 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
             window.setTimeout(() => {
               setRunning((r) => r.map((v, k) => (k === i ? false : v)))
               setStrips((p) => p.map((s, k) => (k === i ? s.slice(-VISIBLE) : s)))
-            }, 450),
+            }, 450)
           )
           if (i === 2) {
             timers.current.push(
@@ -320,26 +287,29 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
                       const a = (id / 30) * Math.PI * 2 + Math.random() * 0.4
                       const d = 80 + Math.random() * 110
                       return { id, x: Math.cos(a) * d, y: Math.sin(a) * d, color: PCOL[id % 4], size: 4 + Math.random() * 5 }
-                    }),
+                    })
                   )
+
+                  // Add GSAP coin burst for wins
+                  if (spinButtonRef.current) {
+                    const rect = spinButtonRef.current.getBoundingClientRect()
+                    const centerX = rect.left + rect.width / 2
+                    const centerY = rect.top + rect.height / 2
+                    createCoinBurst({
+                      x: centerX,
+                      y: centerY,
+                      count: 12,
+                    })
+                  }
                 }
                 setSpinning(false)
-              }, 480),
+              }, 480)
             )
           }
-        }, BASE_MS + i * STAGGER_MS),
+        }, BASE_MS + i * STAGGER_MS)
       )
     })
-  }, [])
-
-  useEffect(() => {
-    autoSpinInterval.current = window.setInterval(() => {
-      if (!spinning) {
-        spin()
-      }
-    }, 8000)
-    return () => { if (autoSpinInterval.current) window.clearInterval(autoSpinInterval.current) }
-  }, [spinning, spin])
+  }, [spinning])
 
   useEffect(() => {
     let timeout: number
@@ -373,7 +343,11 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
   const win = result === 'win'
 
   return (
-    <section className={`flex w-full flex-col overflow-hidden ${className}`.trim()} aria-label="Lucky Match mini-game">
+    <section
+      className={`flex w-full flex-col overflow-hidden cursor-pointer ${className}`.trim()}
+      aria-label="Lucky Match mini-game"
+      onClick={spin}
+    >
       <div className="relative w-full shrink-0" style={{ height: '560px' }}>
         <div
           className="absolute overflow-hidden rounded-[12%]"
@@ -468,14 +442,7 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
           priority={false}
         />
 
-        <button
-          type="button"
-          onClick={spin}
-          disabled={spinning}
-          aria-label="Spin Lucky Match"
-          className="absolute z-20 cursor-pointer rounded-full disabled:cursor-not-allowed"
-          style={{ left: '22.5%', width: '55%', top: '78.8%', height: '9.2%' }}
-        />
+       
       </div>
 
       <div className="relative z-20 mx-[2%] -mt-[16%] mb-0 flex h-[408px] flex-col rounded-[18px] border border-indigo-400/45 bg-[#0A0624]/95 p-2.5 shadow-[0_8px_28px_rgba(0,0,0,0.45),0_0_18px_rgba(110,60,255,0.18)] overflow-hidden">

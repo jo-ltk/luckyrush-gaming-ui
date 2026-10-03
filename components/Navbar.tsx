@@ -1,8 +1,43 @@
 'use client'
 
 import Image from 'next/image'
-import { Home, Plus, Search } from 'lucide-react'
+import { Bell, Home, Plus, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useState, useRef, useEffect } from 'react'
+
+function useCountUp(value: string, duration: number = 1000) {
+  const [displayValue, setDisplayValue] = useState('0')
+
+  useEffect(() => {
+    const numericValue = parseFloat(value.replace(/,/g, ''))
+    const isDecimal = value.includes('.')
+    let currentValue = 0
+    let startTime: number | null = null
+
+    const animate = (timestamp: number) => {
+      if (!startTime) startTime = timestamp
+      const elapsed = timestamp - startTime
+      const progress = Math.min(elapsed / duration, 1)
+
+      // Linear interpolation for smooth counting
+      currentValue = numericValue * progress
+
+      if (isDecimal) {
+        setDisplayValue(currentValue.toFixed(2))
+      } else {
+        setDisplayValue(Math.floor(currentValue).toLocaleString())
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      }
+    }
+
+    requestAnimationFrame(animate)
+  }, [value, duration])
+
+  return displayValue
+}
 
 const navItems = [
   { label: 'Lobby', href: '#lobby', active: true },
@@ -50,6 +85,9 @@ function BalanceWidget({
   coinClassName: string
   borderClassName: string
 }) {
+  const animatedAmount = useCountUp(amount, 1200)
+  const coinImage = type === 'GC' ? '/golden-crown-coin.png' : '/emerald-crown-coin.png'
+
   return (
     <div
       className={cn(
@@ -81,20 +119,23 @@ function BalanceWidget({
           items-center
           justify-center
           rounded-full
-          text-[9px]
-          font-bold
-          tracking-tight
           shadow-[inset_0_1px_1px_rgba(255,255,255,.45)]
           `,
           coinClassName
         )}
       >
-        {type}
+        <Image
+          src={coinImage}
+          alt={`${type} coin`}
+          width={24}
+          height={24}
+          className="size-[24px] object-contain"
+        />
       </div>
 
       {/* Balance */}
       <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-[#E8E5F2]">
-        {amount}
+        {animatedAmount}
       </span>
 
       {/* Plus */}
@@ -128,6 +169,90 @@ function BalanceWidget({
   )
 }
 
+function JoinNowButton() {
+  const [isShining, setIsShining] = useState(false)
+  const timeoutRef = useRef<number | null>(null)
+
+  const triggerShine = () => {
+    setIsShining(true)
+
+    if (timeoutRef.current) {
+      window.clearTimeout(timeoutRef.current)
+    }
+
+    timeoutRef.current = window.setTimeout(() => {
+      setIsShining(false)
+    }, 700)
+  }
+
+  const handlePointerEnter = () => {
+    triggerShine()
+  }
+
+  const handlePointerDown = () => {
+    triggerShine()
+  }
+
+  return (
+    <a
+      href="#join"
+      className="
+        group
+        relative
+        inline-flex
+        h-[42px]
+        w-[82px]
+        items-center
+        justify-center
+        overflow-hidden
+        rounded-[11px]
+        border
+        border-fuchsia-400/40
+        bg-gradient-to-r
+        from-[#8F32E8]
+        via-[#D946EF]
+        to-[#C026D3]
+        text-[11px]
+        font-bold
+        text-white
+        shadow-[0_0_18px_rgba(217,70,239,.28)]
+        transition-all
+        duration-300
+        hover:brightness-110
+        sm:h-[44px]
+        sm:w-[95px]
+        sm:text-[12px]
+        md:w-[108px]
+        lg:h-[48px]
+        lg:w-[128px]
+        lg:text-[13px]
+      "
+      onPointerEnter={handlePointerEnter}
+      onPointerDown={handlePointerDown}
+    >
+      <span
+        className={cn(
+          `
+            absolute
+            inset-0
+            -translate-x-full
+            bg-gradient-to-r
+            from-transparent
+            via-white/15
+            to-transparent
+            transition-transform
+            duration-700
+          `,
+          isShining && 'translate-x-full'
+        )}
+      />
+
+      <span className="relative z-10">
+        Join Now
+      </span>
+    </a>
+  )
+}
 
 export function Navbar() {
   return (
@@ -135,16 +260,16 @@ export function Navbar() {
       className="
         fixed
         inset-x-0
-        top-4
+        top-2
         z-30
-        h-[76px]
+        h-auto
         border-b
         border-[#24213B]
         bg-[#07061A]/95
         backdrop-blur-xl
       "
     >
-      {/* subtle top ambient glow */}
+      {/* Top glow */}
       <div
         className="
           pointer-events-none
@@ -162,28 +287,43 @@ export function Navbar() {
       <div
         className="
           flex
-          h-full
+          min-h-[68px]
           w-full
           items-center
-          gap-4
-          px-5
+          gap-2
+          px-3
+          sm:px-4
+          md:px-5
+          lg:gap-3
           xl:px-6
         "
       >
         {/* LOGO */}
         <LuckyRushLogo
-          className="h-[48px] w-[154px]"
+          className="
+            h-[38px]
+            w-[125px]
+            shrink-0
+            sm:h-[42px]
+            sm:w-[138px]
+            md:h-[44px]
+            md:w-[145px]
+            lg:h-[46px]
+            lg:w-[150px]
+            xl:h-[48px]
+            xl:w-[154px]
+          "
         />
 
-        {/* MAIN NAV */}
+        {/* DESKTOP NAV */}
         <nav
           aria-label="Primary"
           className="
-            flex
-            h-full
+            hidden
             shrink-0
             items-center
-            gap-1
+            gap-0.5
+            lg:flex
           "
         >
           {navItems.map((item) =>
@@ -195,36 +335,37 @@ export function Navbar() {
                   group
                   relative
                   flex
-                  h-[48px]
-                  w-[118px]
+                  h-[44px]
+                  w-[100px]
                   items-center
                   justify-center
-                  gap-2.5
+                  gap-2
                   overflow-hidden
-                  rounded-[14px]
+                  rounded-[12px]
                   border
                   border-[#B84DFF]/45
                   bg-gradient-to-r
                   from-[#8F32E8]
                   via-[#6523B7]
                   to-[#32145F]
-                  text-[14px]
+                  text-[13px]
                   font-bold
                   text-white
                   shadow-[0_0_16px_rgba(153,51,238,.28)]
                   transition-all
                   duration-300
-                  hover:border-[#D05AFF]/65
-                  hover:shadow-[0_0_22px_rgba(168,85,247,.4)]
+                  xl:h-[48px]
+                  xl:w-[118px]
+                  xl:gap-2.5
+                  xl:text-[14px]
                 "
               >
-                {/* left glow */}
                 <span
                   className="
                     absolute
                     left-0
                     top-1/2
-                    h-[34px]
+                    h-[30px]
                     w-[3px]
                     -translate-y-1/2
                     rounded-r-full
@@ -233,13 +374,12 @@ export function Navbar() {
                   "
                 />
 
-                {/* inner highlight */}
                 <span
                   className="
                     pointer-events-none
                     absolute
                     inset-[1px]
-                    rounded-[13px]
+                    rounded-[11px]
                     border
                     border-white/[0.08]
                   "
@@ -249,9 +389,9 @@ export function Navbar() {
                   className="
                     relative
                     z-10
-                    size-[19px]
+                    size-[17px]
                     text-[#F0B5FF]
-                    drop-shadow-[0_0_7px_rgba(235,130,255,.5)]
+                    xl:size-[19px]
                   "
                   strokeWidth={2.2}
                 />
@@ -268,26 +408,28 @@ export function Navbar() {
                   group
                   relative
                   inline-flex
-                  h-[48px]
+                  h-[44px]
                   items-center
-                  rounded-[13px]
-                  px-3.5
-                  text-[14px]
+                  rounded-[12px]
+                  px-2.5
+                  text-[12px]
                   font-medium
                   text-[#A9A8BB]
                   transition-all
                   duration-200
                   hover:bg-white/[0.035]
                   hover:text-white
+                  xl:h-[48px]
+                  xl:px-3.5
+                  xl:text-[14px]
                 "
               >
                 {item.label}
 
-                {/* hover underline glow */}
                 <span
                   className="
                     absolute
-                    bottom-[7px]
+                    bottom-[6px]
                     left-1/2
                     h-[2px]
                     w-0
@@ -305,35 +447,39 @@ export function Navbar() {
           )}
         </nav>
 
-        {/* FLEX SPACER */}
-        <div className="min-w-4 flex-1" />
+        {/* SPACER */}
+        <div className="min-w-1 flex-1" />
 
         {/* RIGHT SIDE */}
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
 
           {/* SEARCH */}
           <label
             className="
               group
               relative
-              flex
-              h-[46px]
-              w-[235px]
+              hidden
+              h-[42px]
+              w-[170px]
               items-center
+              lg:flex
+              xl:h-[46px]
+              xl:w-[235px]
             "
           >
             <Search
               className="
                 pointer-events-none
                 absolute
-                left-3.5
-                size-[17px]
+                left-3
+                size-[16px]
                 text-[#77758D]
                 transition-colors
                 duration-200
                 group-focus-within:text-violet-300
+                xl:left-3.5
+                xl:size-[17px]
               "
-              strokeWidth={2}
             />
 
             <input
@@ -343,69 +489,112 @@ export function Navbar() {
               className="
                 h-full
                 w-full
-                rounded-[13px]
+                rounded-[12px]
                 border
                 border-[#292642]
                 bg-[#0B0A1F]
                 py-0
-                pl-10
-                pr-4
-                text-[13px]
+                pl-9
+                pr-3
+                text-[12px]
                 text-white
                 outline-none
                 placeholder:text-[#68667B]
                 transition-all
                 duration-300
-                hover:border-[#3B315C]
-                focus:border-violet-400/55
-                focus:bg-[#0E0C26]
-                focus:shadow-[0_0_0_3px_rgba(139,92,246,.10)]
+                xl:pl-10
+                xl:pr-4
+                xl:text-[13px]
               "
             />
           </label>
 
-          {/* GC */}
-          <BalanceWidget
-            type="GC"
-            amount="25,600"
-            borderClassName="border border-amber-400/20"
-            coinClassName="
-              bg-gradient-to-b
-              from-[#FFE566]
-              via-[#F5C518]
-              to-[#D4A017]
-              text-[#1a1200]
-            "
-          />
+          {/* BALANCES */}
+          <div className="hidden xl:flex items-center gap-2">
+            <BalanceWidget
+              type="GC"
+              amount="25,600"
+              borderClassName="border border-amber-400/20"
+              coinClassName="
+                bg-gradient-to-b
+                from-[#FFE566]
+                via-[#F5C518]
+                to-[#D4A017]
+                text-[#1a1200]
+              "
+            />
 
-          {/* SC */}
-          <BalanceWidget
-            type="SC"
-            amount="12.50"
-            borderClassName="border border-emerald-400/20"
-            coinClassName="
-              bg-gradient-to-b
-              from-[#6EE7A8]
-              via-[#22C55E]
-              to-[#15803D]
-              text-white
+            <BalanceWidget
+              type="SC"
+              amount="12.50"
+              borderClassName="border border-emerald-400/20"
+              coinClassName="
+                bg-gradient-to-b
+                from-[#6EE7A8]
+                via-[#22C55E]
+                to-[#15803D]
+                text-white
+              "
+            />
+          </div>
+
+          {/* NOTIFICATIONS */}
+          <button
+            type="button"
+            aria-label="Notifications"
+            className="
+              relative
+              flex
+              size-[42px]
+              shrink-0
+              items-center
+              justify-center
+              rounded-full
+              border
+              border-[#292642]
+              bg-[#0C0A20]
+              text-[#A9A8BB]
+              transition-all
+              duration-300
+              hover:border-violet-400/40
+              hover:bg-violet-500/[.08]
+              hover:text-white
+              lg:size-[44px]
+              xl:size-[46px]
             "
-          />
+          >
+            <Bell className="size-[18px] lg:size-[19px] xl:size-[20px]" strokeWidth={2} />
+
+            {/* Notification dot */}
+            <span
+              className="
+                absolute
+                right-2
+                top-2
+                size-[8px]
+                rounded-full
+                bg-red-500
+                shadow-[0_0_8px_rgba(239,68,68,.6)]
+                lg:size-[9px]
+                xl:size-[10px]
+              "
+            />
+          </button>
 
           {/* LOGIN */}
           <a
             href="#login"
             className="
               inline-flex
-              h-[46px]
-              w-[92px]
+              h-[42px]
+              w-[70px]
               items-center
               justify-center
-              rounded-[13px]
+              rounded-[11px]
               border
               border-[#403667]
               bg-[#0C0A20]
-              text-[13px]
+              text-[12px]
               font-bold
               text-[#D4D1DF]
               transition-all
@@ -413,62 +602,73 @@ export function Navbar() {
               hover:border-violet-400/55
               hover:bg-violet-500/[.08]
               hover:text-white
-              hover:shadow-[0_0_16px_rgba(139,92,246,.14)]
+              sm:h-[44px]
+              sm:w-[78px]
+              sm:text-[13px]
+              md:w-[85px]
+              lg:h-[46px]
+              lg:w-[92px]
             "
           >
             Login
           </a>
 
           {/* JOIN NOW */}
-          <a
-            href="#join"
-            className="
-              group
-              relative
-              inline-flex
-              h-[48px]
-              w-[128px]
-              items-center
-              justify-center
-              overflow-hidden
-              rounded-[13px]
-              border
-              border-fuchsia-400/40
-              bg-gradient-to-r
-              from-[#8F32E8]
-              via-[#D946EF]
-              to-[#C026D3]
-              text-[13px]
-              font-bold
-              text-white
-              shadow-[0_0_18px_rgba(217,70,239,.28)]
-              transition-all
-              duration-300
-              hover:brightness-110
-              hover:shadow-[0_0_25px_rgba(217,70,239,.42)]
-              active:scale-[.98]
-            "
-          >
-            <span
-              className="
-                absolute
-                inset-0
-                -translate-x-full
-                bg-gradient-to-r
-                from-transparent
-                via-white/15
-                to-transparent
-                transition-transform
-                duration-700
-                group-hover:translate-x-full
-              "
-            />
-
-            <span className="relative z-10">
-              Join Now
-            </span>
-          </a>
+          <JoinNowButton />
         </div>
+      </div>
+
+      {/* MOBILE NAV */}
+      <div
+        className="
+          flex
+          w-full
+          items-center
+          gap-1
+          overflow-x-auto
+          border-t
+          border-[#24213B]
+          px-3
+          py-2
+          scrollbar-none
+          lg:hidden
+        "
+      >
+        {navItems.map((item) => (
+          <a
+            key={item.label}
+            href={item.href}
+            className={cn(
+              `
+                shrink-0
+                rounded-full
+                px-3
+                py-1.5
+                text-[11px]
+                font-semibold
+                transition-all
+              `,
+              item.active
+                ? `
+                  border
+                  border-[#B84DFF]/45
+                  bg-gradient-to-r
+                  from-[#8F32E8]
+                  to-[#6523B7]
+                  text-white
+                  shadow-[0_0_12px_rgba(153,51,238,.22)]
+                `
+                : `
+                  border
+                  border-[#292642]
+                  bg-[#0C0A20]
+                  text-[#A9A8BB]
+                `
+            )}
+          >
+            {item.label}
+          </a>
+        ))}
       </div>
     </header>
   )

@@ -9,7 +9,22 @@ import {
 } from 'lucide-react'
 import { LuckyMatchGame } from '@/components/LuckyMatchGame'
 import { LuckyRushLogo, Navbar } from '@/components/Navbar'
+import { SparkleBadge } from '@/components/SparkleBadge'
+import { FirstVisitPopups } from '@/components/FirstVisitPopups'
 import { cn } from '@/lib/utils'
+import {
+  useLuckyRushAnimations,
+  useGameCardAnimation,
+  usePromoCardAnimation,
+  useCategoryFilterAnimation,
+  useSidebarMenuItemAnimation,
+  useHeroMotion,
+  animateLiveWin,
+  createSparkBurst,
+  animateRewardCounter,
+  showRewardPopup,
+} from '@/lib/gsap-animations'
+import gsap from 'gsap'
 
 type Game = { name: string; category: string; tags?: string[]; colors: string; badge?: string; icon: string; cover?: string; }
 
@@ -25,17 +40,17 @@ const navSecondary = [
 ]
 const games: Game[] = [
   { name: 'Neon Fortune', category: 'For You', tags: ['Slots', 'Bonus Buy'], colors: 'from-fuchsia-700 via-violet-600 to-indigo-950', badge: 'NEW', icon: '✦', cover: '/neon-fortune-777-jackpot.png' },
-  { name: 'Golden Safari', category: 'Trending', tags: ['Slots', 'Live Casino'], colors: 'from-amber-500 via-orange-700 to-emerald-950', icon: '♛', cover: '/golden-safari-lion-jackpot.png' },
+  { name: 'Golden Safari', category: 'Trending', tags: ['Slots', 'Live Casino'], colors: 'from-amber-500 via-orange-700 to-emerald-950', badge: 'HOT', icon: '♛', cover: '/golden-safari-lion-jackpot.png' },
   { name: 'Lucky Lanterns', category: 'New Games', tags: ['Slots', 'Bonus Buy'], colors: 'from-red-500 via-fuchsia-600 to-indigo-950', badge: 'NEW', icon: '✧', cover: '/lucky-lanterns-fortune-in-gold.png' },
   { name: 'Ruby Rush', category: 'Jackpots', tags: ['Slots', 'Table Games'], colors: 'from-rose-700 via-red-500 to-orange-900', badge: 'EXCLUSIVE', icon: '◆', cover: '/ruby-rush-glimmering-treasure-jackpot.png' },
-  { name: 'Cosmic Coins', category: 'Trending', tags: ['Slots', 'Bonus Buy'], colors: 'from-cyan-500 via-blue-700 to-violet-950', icon: '✦', cover: '/cosmic-coins-astronaut-jackpot.png' },
-  { name: 'Jungle Jackpot', category: 'Jackpots', tags: ['Slots', 'Live Casino'], colors: 'from-lime-600 via-emerald-700 to-teal-950', icon: '♜', cover: '/jungle-jackpot-monkey-adventure.png' },
-  { name: 'Royal Reels', category: 'For You', tags: ['Slots', 'Table Games'], colors: 'from-yellow-500 via-amber-700 to-purple-950', icon: '♚', cover: '/royal-reels-the-golden-king.png' },
-  { name: 'Mystic Gems', category: 'Popular', tags: ['Slots', 'Live Casino'], colors: 'from-purple-600 via-blue-600 to-slate-950', icon: '◇', cover: '/mystic-gems-neon-crystal-fantasy.png' },
-  { name: 'Treasure Trail', category: 'Hold & Win', tags: ['Slots', 'Bonus Buy'], colors: 'from-orange-500 via-yellow-700 to-red-950', icon: '☼', cover: '/pirate-treasure-trail-adventure.png' },
+  { name: 'Cosmic Coins', category: 'Trending', tags: ['Slots', 'Bonus Buy'], colors: 'from-cyan-500 via-blue-700 to-violet-950', badge: 'HOT', icon: '✦', cover: '/cosmic-coins-astronaut-jackpot.png' },
+  { name: 'Jungle Jackpot', category: 'Jackpots', tags: ['Slots', 'Live Casino'], colors: 'from-lime-600 via-emerald-700 to-teal-950', badge: 'JACKPOT', icon: '♜', cover: '/jungle-jackpot-monkey-adventure.png' },
+  { name: 'Royal Reels', category: 'For You', tags: ['Slots', 'Table Games'], colors: 'from-yellow-500 via-amber-700 to-purple-950', badge: 'VIP', icon: '♚', cover: '/royal-reels-the-golden-king.png' },
+  { name: 'Mystic Gems', category: 'Popular', tags: ['Slots', 'Live Casino'], colors: 'from-purple-600 via-blue-600 to-slate-950', badge: 'NEW', icon: '◇', cover: '/mystic-gems-neon-crystal-fantasy.png' },
+  { name: 'Treasure Trail', category: 'Hold & Win', tags: ['Slots', 'Bonus Buy'], colors: 'from-orange-500 via-yellow-700 to-red-950', badge: 'BONUS', icon: '☼', cover: '/pirate-treasure-trail-adventure.png' },
   { name: 'Candy Vault', category: 'Popular', tags: ['Slots', 'Table Games'], colors: 'from-pink-500 via-purple-600 to-sky-950', badge: 'NEW', icon: '●', cover: '/candy-vault-sweet-fantasy-kingdom.png' },
-  { name: 'Dragon Gold', category: 'Jackpots', tags: ['Slots', 'Live Casino'], colors: 'from-red-700 via-orange-600 to-amber-950', icon: '♨', cover: '/dragon-gold-fiery-treasure-quest.png' },
-  { name: 'Moonlight Wins', category: 'For You', tags: ['Slots', 'Table Games'], colors: 'from-indigo-500 via-violet-700 to-slate-950', icon: '☾', cover: '/moonlit-wolf-wins.png' },
+  { name: 'Dragon Gold', category: 'Jackpots', tags: ['Slots', 'Live Casino'], colors: 'from-red-700 via-orange-600 to-amber-950', badge: 'EXCLUSIVE', icon: '♨', cover: '/dragon-gold-fiery-treasure-quest.png' },
+  { name: 'Moonlight Wins', category: 'For You', tags: ['Slots', 'Table Games'], colors: 'from-indigo-500 via-violet-700 to-slate-950', badge: 'HOT', icon: '☾', cover: '/moonlit-wolf-wins.png' },
 ]
 type Win = {
   user: string
@@ -48,23 +63,16 @@ type DisplayWin = Win & {
   id: string
 }
 
-function easeOutCubic(t: number): number {
-  return 1 - Math.pow(1 - t, 3)
-}
-
 function AnimatedWinAmount({ amount, winId, isNew }: { amount: string; winId: string; isNew: boolean }) {
-  const [displayedAmount, setDisplayedAmount] = useState(amount)
+  const elementRef = useRef<HTMLSpanElement>(null)
   const animatedIds = useRef<Set<string>>(new Set())
-  const lastUpdateTime = useRef(0)
 
   useEffect(() => {
-    if (!isNew) {
-      setDisplayedAmount(amount)
+    if (!isNew || !elementRef.current) {
       return
     }
 
     if (animatedIds.current.has(winId)) {
-      setDisplayedAmount(amount)
       return
     }
 
@@ -74,34 +82,11 @@ function AnimatedWinAmount({ amount, winId, isNew }: { amount: string; winId: st
     animatedIds.current.add(winId)
     const [, prefix, numericStr, suffix] = match
     const targetValue = parseInt(numericStr.replace(/,/g, ''), 10)
-    const startValue = 0
-    const duration = 600
-    const startTime = performance.now()
-    const throttleMs = 33
 
-    const animate = (currentTime: number) => {
-      const elapsed = currentTime - startTime
-      const progress = Math.min(elapsed / duration, 1)
-      const easedProgress = easeOutCubic(progress)
-      const currentValue = Math.floor(startValue + (targetValue - startValue) * easedProgress)
-      const formattedValue = currentValue.toLocaleString()
-
-      if (currentTime - lastUpdateTime.current > throttleMs) {
-        setDisplayedAmount(`${prefix}${formattedValue} ${suffix}`)
-        lastUpdateTime.current = currentTime
-      }
-
-      if (progress < 1) {
-        requestAnimationFrame(animate)
-      } else {
-        setDisplayedAmount(`${prefix}${formattedValue} ${suffix}`)
-      }
-    }
-
-    requestAnimationFrame(animate)
+    animateRewardCounter(elementRef.current, targetValue, 0.8, prefix, ` ${suffix}`)
   }, [amount, winId, isNew])
 
-  return <>{displayedAmount}</>
+  return <span ref={elementRef}>{amount}</span>
 }
 
 const wins: Win[] = [
@@ -124,14 +109,14 @@ function NavItem({
   onSelect?: () => void
 }) {
   const Icon = item.icon
+  const itemRef = useRef<HTMLButtonElement>(null)
+  useSidebarMenuItemAnimation(itemRef, active)
 
   return (
-    <motion.button
+    <button
+      ref={itemRef}
       type="button"
       onClick={onSelect}
-      whileHover={{ x: active ? 0 : 2 }}
-      whileTap={{ scale: 0.985 }}
-      transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
         'group relative flex h-[58px] w-full cursor-pointer items-center gap-[22px] rounded-[14px] px-[22px] text-left text-[15px] font-bold transition-all duration-300',
         active && 'overflow-hidden border border-[#B84DFF]/55 bg-gradient-to-r from-[#8F32E8] via-[#6523B7] to-[#32145F] text-white shadow-[0_0_18px_rgba(153,51,238,.28)]',
@@ -161,7 +146,7 @@ function NavItem({
       />
 
       <span className="relative z-10">{item.label}</span>
-    </motion.button>
+    </button>
   )
 }
 
@@ -221,6 +206,8 @@ const heroSlides = [
 
 function Hero() {
   const [current, setCurrent] = useState(0)
+  const heroRef = useRef<HTMLDivElement>(null)
+  useHeroMotion(heroRef)
 
   useEffect(() => {
     const t = setInterval(() => setCurrent(i => (i + 1) % heroSlides.length), 4500)
@@ -228,7 +215,7 @@ function Hero() {
   }, [])
 
   return (
-    <div className="relative min-h-[292px] overflow-hidden rounded-[18px] border border-[#30234A] bg-[#100A24] shadow-[0_12px_40px_rgba(0,0,0,.22)]">
+    <div ref={heroRef} className="relative min-h-[240px] sm:min-h-[292px] overflow-hidden rounded-[18px] border border-[#30234A] bg-[#100A24] shadow-[0_12px_40px_rgba(0,0,0,.22)]">
       {/* Carousel images */}
       <AnimatePresence initial={false}>
         <motion.div
@@ -254,11 +241,11 @@ function Hero() {
       <div className="absolute inset-0 bg-gradient-to-t from-[#0d0820]/60 via-transparent to-transparent" />
 
       {/* Content */}
-      <div className="relative z-10 flex h-full min-h-[292px] flex-col justify-center px-9 py-8">
+      <div className="relative z-10 flex h-full min-h-[292px] flex-col justify-center px-6 py-6 sm:px-8 sm:py-7 lg:px-9 lg:py-8">
         <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.25em] text-fuchsia-300">
           <Sparkles className="size-3" /> Your lucky era starts here
         </p>
-        <h1 className="w-fit text-[46px] sm:text-[52px] lg:text-[58px] xl:text-[66px] 2xl:text-[72px] font-black leading-[0.92] tracking-tight select-none">
+        <h1 className="w-fit text-[36px] sm:text-[46px] md:text-[52px] lg:text-[58px] xl:text-[66px] 2xl:text-[72px] font-black leading-[0.92] tracking-tight select-none">
           <span className="block bg-gradient-to-b from-white via-[#F5EDFF] to-[#BF7EFF] bg-clip-text text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] drop-shadow-[0_0_18px_rgba(191,126,255,0.4)] whitespace-nowrap">
             PLAY. SPIN.
           </span>
@@ -266,7 +253,7 @@ function Hero() {
             GET REWARDED.
           </span>
         </h1>
-        <p className="mt-3 max-w-[280px] text-md leading-5 text-slate-300">
+        <p className="mt-3 max-w-[280px] text-[13px] sm:text-md leading-5 text-slate-300">
           Thousands of games. Daily rewards.<br />
           New favorites every week.
         </p>
@@ -279,8 +266,10 @@ function Hero() {
               bg-gradient-to-r
               from-[#8F32E8]
               to-[#D946EF]
-              px-5
-              py-3
+              px-4
+              py-2.5
+              sm:px-5
+              sm:py-3
               text-[10px]
               font-bold
               uppercase
@@ -294,7 +283,7 @@ function Hero() {
           >
             Play Now
           </button>
-          <button className="rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur">
+          <button className="rounded-lg border border-white/20 bg-white/10 px-3 py-2 sm:px-4 sm:py-2.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur">
             View Games
           </button>
         </div>
@@ -326,6 +315,7 @@ function LatestWins() {
   )
 
   const nextIndex = useRef(0)
+  const rowRefs = useRef<Map<string, HTMLElement>>(new Map())
 
   useEffect(() => {
     let timeout: number
@@ -341,7 +331,68 @@ function LatestWins() {
           time: 'just now',
         }
 
-        return [newWin, ...prev].slice(0, 7)
+        const newWins = [newWin, ...prev].slice(0, 7)
+
+        // Trigger animation for the new win
+        setTimeout(() => {
+          const row = rowRefs.current.get(newWin.id)
+          if (row) {
+            gsap.fromTo(
+              row,
+              { boxShadow: '0 0 0 rgba(217, 70, 239, 0)' },
+              {
+                boxShadow: '0 0 20px rgba(217, 70, 239, 0.3)',
+                duration: 0.4,
+                yoyo: true,
+                repeat: 1,
+                ease: 'power2.inOut',
+              }
+            )
+
+            const avatar = row.querySelector('img')
+            if (avatar) {
+              gsap.fromTo(
+                avatar,
+                { scale: 1 },
+                {
+                  scale: 1.08,
+                  duration: 0.3,
+                  yoyo: true,
+                  repeat: 1,
+                  ease: 'power2.inOut',
+                }
+              )
+            }
+
+            const rewardText = row.querySelector('.text-amber-300')
+            if (rewardText) {
+              const rect = rewardText.getBoundingClientRect()
+              createSparkBurst({
+                x: rect.left + rect.width / 2,
+                y: rect.top + rect.height / 2,
+                count: 6,
+                size: 3,
+              })
+            }
+
+            const timeText = row.querySelector('.text-fuchsia-300')
+            if (timeText) {
+              gsap.fromTo(
+                timeText,
+                { filter: 'brightness(1)' },
+                {
+                  filter: 'brightness(1.5)',
+                  duration: 0.3,
+                  yoyo: true,
+                  repeat: 1,
+                  ease: 'power2.inOut',
+                }
+              )
+            }
+          }
+        }, 50)
+
+        return newWins
       })
 
       // Random 2.4–3.8 sec interval
@@ -354,8 +405,8 @@ function LatestWins() {
   }, [])
 
   return (
-    <section className="w-full flex-shrink-0 rounded-2xl border border-white/[.08] bg-white/[.035] p-4">
-      <div className="mb-4 flex items-center justify-between">
+    <section className="w-full flex-shrink-0 rounded-2xl border border-white/[.08] bg-white/[.035] p-4 overflow-hidden" style={{ height: '480px' }}>
+      <div className="mb-4 flex items-center justify-between flex-shrink-0">
         <div>
           <p className="text-[14px] font-bold uppercase tracking-[.2em] text-fuchsia-300">
             Live activity
@@ -371,12 +422,14 @@ function LatestWins() {
         </button>
       </div>
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 overflow-hidden">
         <AnimatePresence initial={false}>
           {displayWins.map((win: DisplayWin, index: number) => (
             <motion.div
               key={win.id}
-              layout="position"
+              ref={(el) => {
+                if (el) rowRefs.current.set(win.id, el)
+              }}
               initial={{
                 opacity: 0,
                 y: -45,
@@ -390,12 +443,6 @@ function LatestWins() {
                 y: 30,
               }}
               transition={{
-                layout: {
-                  type: 'spring',
-                  stiffness: 700,
-                  damping: 40,
-                  mass: 0.35,
-                },
                 opacity: {
                   duration: 0.32,
                 },
@@ -407,7 +454,7 @@ function LatestWins() {
                 },
               }}
               className={cn(
-                'relative flex items-center gap-2.5 rounded-xl border border-white/[.05] bg-black/20 p-2',
+                'relative flex items-center gap-2.5 rounded-xl border border-white/[.05] bg-black/20 p-2 h-14 flex-shrink-0',
                 index === 0 &&
                   'shadow-[0_0_18px_rgba(217,70,239,.12)]'
               )}
@@ -471,31 +518,23 @@ function MiniGameCenter() {
   )
 }
 
-function PromoCards() {
-  const items = [
-    { title: 'Daily Rewards', text: 'Log in every day and claim exciting rewards!', icon: Gift, color: 'from-fuchsia-500/25 to-violet-500/5', background: '/daily-rewards-banner.png', accent: 'gold', align: 'right' },
-    { title: 'New Games Weekly', text: 'Fresh games, new experiences every week.', icon: Sparkles, color: 'from-cyan-500/20 to-blue-500/5', background: '/new-games-banner.png', accent: 'cyan', align: 'left' },
-    { title: 'Free-to-Play', text: 'Play your favorite games with GC & SC', icon: Zap, color: 'from-amber-500/20 to-orange-500/5', background: '/free-to-play-banner.png', accent: 'gold', align: 'right' },
-    { title: 'VIP Club', text: 'Unlock exclusive rewards and special perks', icon: Crown, color: 'from-yellow-500/20 to-amber-500/5', background: '/vip-club-golden-crown.png', accent: 'gold', align: 'right' },
-  ]
+function PromoCard({ item }: { item: typeof items[number] }) {
+  const cardRef = useRef<HTMLDivElement>(null)
+  usePromoCardAnimation(cardRef)
+  const Icon = item.icon
+
   return (
-    <motion.div initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.18 } } }} className="grid grid-cols-4 gap-3">
-      {items.map(item => {
-        return (
-          <motion.div
-            key={item.title}
-            variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
-            whileHover={{ y: -3 }}
-            transition={{ duration: 0.25 }}
-            className={cn(
-              'group relative flex h-[120px] items-start overflow-hidden rounded-xl border p-4 transition-shadow hover:shadow-[0_8px_25px_rgba(168,85,247,.18)]',
-              item.background
-                ? item.accent === 'cyan'
-                  ? 'border-cyan-300/40 hover:border-cyan-200/60'
-                  : 'border-amber-300/30 hover:border-amber-200/50'
-                : cn('border-white/[.07] bg-gradient-to-br hover:border-fuchsia-300/30', item.color),
-            )}
-          >
+    <div
+      ref={cardRef}
+      className={cn(
+        'group relative flex h-[100px] sm:h-[120px] items-start overflow-hidden rounded-xl border p-3 sm:p-4 transition-shadow hover:shadow-[0_8px_25px_rgba(168,85,247,.18)]',
+        item.background
+          ? item.accent === 'cyan'
+            ? 'border-cyan-300/40 hover:border-cyan-200/60'
+            : 'border-amber-300/30 hover:border-amber-200/50'
+          : cn('border-white/[.07] bg-gradient-to-br hover:border-fuchsia-300/30', item.color),
+      )}
+    >
             {item.background && (
               <>
                 <Image
@@ -516,20 +555,61 @@ function PromoCards() {
                 />
               </>
             )}
-            <div className="relative z-10 flex w-full flex-col items-start">
-              <p className="text-2xl sm:text-3xl font-black leading-[0.92] tracking-tight text-white drop-shadow-[0_3px_5px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(191,126,255,0.4)]">{item.title}</p>
-              <p className={cn('mt-2 text-lg leading-5', item.background ? 'text-white/90' : 'text-slate-400')}>{item.text}</p>
-            </div>
-          </motion.div>
-        )
-      })}
+      {item.background && (
+        <>
+          <Image
+            src={item.background}
+            alt=""
+            fill
+            className={cn('object-cover scale-[1.12]', item.align === 'right' ? 'object-left' : 'object-center')}
+          />
+          <div
+            className={cn(
+              'absolute inset-0',
+              item.align === 'right'
+                ? item.title === 'Free-to-Play'
+                  ? 'bg-gradient-to-r from-transparent via-[#2a1600]/20 to-[#140a00]/70'
+                  : 'bg-gradient-to-r from-transparent via-[#1a0a2e]/25 to-[#12071f]/70'
+                : 'bg-[#04122c]/35',
+            )}
+          />
+        </>
+      )}
+      <div className="relative z-10 flex w-full flex-col items-start">
+        <p className="text-xl sm:text-2xl md:text-3xl font-black leading-[0.92] tracking-tight text-white drop-shadow-[0_3px_5px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(191,126,255,0.4)]">{item.title}</p>
+        <p className={cn('mt-2 text-sm sm:text-lg leading-5', item.background ? 'text-white/90' : 'text-slate-400')}>{item.text}</p>
+      </div>
+    </div>
+  )
+}
+
+function PromoCards() {
+  const items = [
+    { title: 'Daily Rewards', text: 'Log in every day and claim exciting rewards!', icon: Gift, color: 'from-fuchsia-500/25 to-violet-500/5', background: '/daily-rewards-banner.png', accent: 'gold', align: 'right' },
+    { title: 'New Games Weekly', text: 'Fresh games, new experiences every week.', icon: Sparkles, color: 'from-cyan-500/20 to-blue-500/5', background: '/new-games-banner.png', accent: 'cyan', align: 'left' },
+    { title: 'Free-to-Play', text: 'Play your favorite games with GC & SC', icon: Zap, color: 'from-amber-500/20 to-orange-500/5', background: '/free-to-play-banner.png', accent: 'gold', align: 'right' },
+    { title: 'VIP Club', text: 'Unlock exclusive rewards and special perks', icon: Crown, color: 'from-yellow-500/20 to-amber-500/5', background: '/vip-club-golden-crown.png', accent: 'gold', align: 'right' },
+  ]
+  return (
+    <motion.div initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.18 } } }} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+      {items.map(item => (
+        <motion.div
+          key={item.title}
+          variants={{ hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } }}
+        >
+          <PromoCard item={item} />
+        </motion.div>
+      ))}
     </motion.div>
   )
 }
 
 function GameCard({ game }: { game: Game }) {
+  const cardRef = useRef<HTMLElement>(null)
+  useGameCardAnimation(cardRef)
+
   return (
-    <motion.article initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32 }} whileHover={{ y: -4 }} className="group relative min-w-0">
+    <motion.article ref={cardRef} initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32 }} className="group relative min-w-0">
       <div className={cn('relative aspect-[1.4/1] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br shadow-[0_10px_24px_rgba(0,0,0,.28)] transition duration-300 group-hover:shadow-[0_10px_28px_rgba(168,85,247,.3)]', game.colors)}>
         {game.cover ? (
           <Image src={game.cover} alt={game.name} fill className="object-cover" />
@@ -544,9 +624,20 @@ function GameCard({ game }: { game: Game }) {
           </>
         )}
         {game.badge && (
-          <span className={cn('absolute left-2 top-2 rounded-md px-1.5 py-1 text-[8px] font-bold tracking-wider text-white', game.badge === 'NEW' ? 'bg-[#FF20E8] shadow-[0_0_14px_rgba(255,32,232,.4)]' : 'bg-[#6D19FF] shadow-[0_0_14px_rgba(109,25,255,.4)]')}>
+          <SparkleBadge
+            className={cn('absolute left-2 top-2 rounded-lg px-3 py-2 text-[11px] font-bold tracking-wider text-white',
+              game.badge === 'NEW' ? 'bg-[#FF20E8] shadow-[0_0_18px_rgba(255,32,232,.6)]' :
+              game.badge === 'EXCLUSIVE' ? 'bg-[#6D19FF] shadow-[0_0_18px_rgba(109,25,255,.6)]' :
+              game.badge === 'HOT' ? 'bg-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,.6)]' :
+              game.badge === 'JACKPOT' ? 'bg-[#FFD700] shadow-[0_0_18px_rgba(255,215,0,.6)]' :
+              game.badge === 'VIP' ? 'bg-[#9D4EDD] shadow-[0_0_18px_rgba(157,78,221,.6)]' :
+              game.badge === 'BONUS' ? 'bg-[#00CED1] shadow-[0_0_18px_rgba(0,206,209,.6)]' :
+              'bg-[#6D19FF] shadow-[0_0_18px_rgba(109,25,255,.6)]'
+            )}
+            badgeType={game.badge as "NEW" | "EXCLUSIVE" | "HOT" | "JACKPOT" | "VIP" | "BONUS"}
+          >
             {game.badge}
-          </span>
+          </SparkleBadge>
         )}
         <button aria-label={`Favorite ${game.name}`} className="absolute right-2 top-2 rounded-full bg-black/25 p-1.5 text-white/70 backdrop-blur transition hover:bg-black/50 hover:text-pink-300">
           <Heart className="size-3.5" />
@@ -560,7 +651,7 @@ function GameCard({ game }: { game: Game }) {
 
 function MobileHeader() { return <header className="sticky top-4 z-40 flex items-center justify-between border-b border-white/10 bg-[#08051A]/95 px-4 py-3 backdrop-blur-xl"><LuckyRushLogo height={36} className="h-9 w-[107px]" /><div className="flex items-center gap-1.5"><div className="rounded-lg border border-amber-400/20 bg-amber-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-amber-300">GC</span> 25,600</div><div className="rounded-lg border border-emerald-400/20 bg-emerald-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-emerald-300">SC</span> 12.50</div><button aria-label="Notifications" className="flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[.04] text-slate-300"><Bell className="size-4" /></button></div></header> }
 
-function MobileQuickNav() { const items = [{ label: 'Home', icon: Home }, { label: 'Slots', icon: Zap }, { label: 'Live Casino', icon: Sparkles }, { label: 'Table Games', icon: Trophy }, { label: 'Promotions', icon: Gift }, { label: 'Search', icon: Search }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-bold', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white' : 'border-white/10 bg-white/[.03] text-slate-400')}><Icon className="size-5" />{label}</button>)}</nav> }
+function MobileQuickNav() { const items = [{ label: 'Home', icon: Home, color: 'text-fuchsia-400' }, { label: 'Slots', icon: Zap, color: 'text-amber-400' }, { label: 'Live Casino', icon: Sparkles, color: 'text-cyan-400' }, { label: 'Table Games', icon: Trophy, color: 'text-yellow-400' }, { label: 'Promotions', icon: Gift, color: 'text-pink-400' }, { label: 'Search', icon: Search, color: 'text-slate-400' }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon, color }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-bold transition-all duration-300', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white shadow-[0_0_15px_rgba(217,70,239,.25)]' : 'border-white/10 bg-white/[.03] text-slate-400 hover:border-white/20 hover:bg-white/[.06]')}><Icon className={cn('size-5', index === 0 ? 'text-fuchsia-300 drop-shadow-[0_0_8px_rgba(217,70,239,.5)]' : color)} />{label}</button>)}</nav> }
 
 function MobileHero() {
   const [current, setCurrent] = useState(0)
@@ -614,56 +705,7 @@ function MobileHero() {
   )
 }
 
-function WelcomeBonusBanner() {
-  const [current, setCurrent] = useState(0)
-  useEffect(() => {
-    const t = setInterval(() => setCurrent(i => (i + 1) % heroSlides.length), 4500)
-    return () => clearInterval(t)
-  }, [])
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="relative mx-4 min-h-[220px] overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#160c32]"
-    >
-      <AnimatePresence initial={false}>
-        <motion.div
-          key={current}
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.96 }}
-          transition={{ duration: 0.85, ease: 'easeInOut' }}
-          className="absolute inset-0"
-        >
-          <Image src={heroSlides[current].src} alt={heroSlides[current].alt} fill className={cn('object-cover opacity-90', heroSlides[current].position)} priority />
-        </motion.div>
-      </AnimatePresence>
-      <div className="absolute inset-0 bg-gradient-to-r from-[#110b27] via-[#1a0e3b]/80 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#0d0820]/55 via-transparent to-transparent" />
-      <div className="relative z-10 flex min-h-[220px] flex-col justify-center px-5 py-6">
-        <p className="text-[9px] font-bold uppercase tracking-[.2em] text-fuchsia-300">A little something extra</p>
-        <h2 className="mt-2 text-[32px] font-black leading-[0.92] tracking-tight select-none">
-          <span className="block bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-transparent drop-shadow-[0_3px_4px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(245,181,32,0.4)] whitespace-nowrap">WELCOME BONUS</span>
-        </h2>
-        <p className="mt-2 max-w-[180px] text-[11px] leading-4 text-slate-300">Sign up now and get <strong className="text-[#F4C84E]">FREE COINS</strong> to start playing!</p>
-        <div className="mt-4 flex gap-2">
-          <button className="rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[#1a0a00] shadow-lg">Claim Reward</button>
-          <button className="rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur">Learn More</button>
-        </div>
-      </div>
-      <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
-        {heroSlides.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrent(i)}
-            className={cn('rounded-full transition-all duration-500', i === current ? 'h-1.5 w-5 bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,.7)]' : 'size-1.5 bg-white/35 hover:bg-white/55')}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
-      </div>
-    </motion.section>
-  )
-}
+
 function MobilePromos() {
   const items = [
     { title: 'Daily Rewards', text: 'Claim every day', icon: Gift, background: '/daily-rewards-banner.png', accent: 'gold', align: 'right' },
@@ -724,12 +766,13 @@ function MobilePromos() {
 
 function MobileGameSection({ title, games: sectionGames }: { title: string; games: Game[] }) { return <section className="flex flex-col gap-3"><div className="flex items-center justify-between px-4"><h2 className="text-lg font-bold text-white">{title}</h2><button className="text-[11px] font-bold text-fuchsia-300">View All</button></div><div className="flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{sectionGames.map(game => <div key={game.name} className="w-[142px] shrink-0"><GameCard game={game} /></div>)}</div></section> }
 
-function MobileBottomNav() { const items = [{ label: 'Home', icon: Home }, { label: 'Games', icon: LayoutGrid }, { label: 'Rewards', icon: Crown }, { label: 'Promotions', icon: Gift }, { label: 'More', icon: Menu }]; return <nav className="fixed inset-x-0 bottom-0 z-50 flex h-[68px] items-end justify-around border-t border-white/10 bg-[#08051A]/95 px-2 pb-2 pt-1 backdrop-blur-xl">{items.map(({ label, icon: Icon }, i) => <button key={label} className={cn('flex min-w-[56px] flex-col items-center gap-1 rounded-xl px-2 py-1 text-[10px] font-bold', i === 2 ? 'bg-gradient-to-t from-fuchsia-600 to-violet-600 text-white shadow-[0_0_20px_rgba(217,70,239,.45)]' : 'text-slate-500')}><Icon className="size-5" />{label}</button>)}</nav> }
+function MobileBottomNav() { const items = [{ label: 'Home', icon: Home, color: 'text-fuchsia-400' }, { label: 'Games', icon: LayoutGrid, color: 'text-cyan-400' }, { label: 'Rewards', icon: Crown, color: 'text-amber-400' }, { label: 'Promotions', icon: Gift, color: 'text-pink-400' }, { label: 'More', icon: Menu, color: 'text-slate-400' }]; return <nav className="fixed inset-x-0 bottom-0 z-50 flex h-[68px] items-end justify-around border-t border-white/10 bg-[#08051A]/95 px-2 pb-2 pt-1 backdrop-blur-xl">{items.map(({ label, icon: Icon, color }, i) => <button key={label} className={cn('flex min-w-[56px] flex-col items-center gap-1 rounded-xl px-2 py-1 text-[10px] font-bold transition-all duration-300', i === 2 ? 'bg-gradient-to-t from-fuchsia-600 to-violet-600 text-white shadow-[0_0_20px_rgba(217,70,239,.45)]' : 'text-slate-500 hover:text-slate-300')}><Icon className={cn('size-5', i === 2 ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,.3)]' : color)} />{label}</button>)}</nav> }
 
-function MobileLobby() { return <div className="flex flex-col gap-5 pb-24 md:hidden"><MobileHeader /><MobileHero /><WelcomeBonusBanner /><MobileQuickNav /><MobilePromos /><div className="px-8"><p className="mb-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p><LuckyMatchGame /></div><MobileGameSection title="Popular Games" games={games.slice(0, 6)} /><MobileGameSection title="Featured Slots" games={games.slice(6, 12)} /><MobileGameSection title="Live Casino" games={games.slice(2, 8)} /><MobileBottomNav /></div> }
+function MobileLobby() { return <div className="flex flex-col gap-5 pb-24 md:hidden"><MobileHeader /><MobileHero /><MobileQuickNav /><MobilePromos /><div className="px-8"><p className="mb-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p><LuckyMatchGame /></div><MobileGameSection title="Popular Games" games={games.slice(0, 6)} /><MobileGameSection title="Featured Slots" games={games.slice(6, 12)} /><MobileGameSection title="Live Casino" games={games.slice(2, 8)} /><MobileBottomNav /></div> }
 
 export default function Page() {
   const [filter, setFilter] = useState('For You')
+  useLuckyRushAnimations()
 
   const filters = [
     { label: 'For You', icon: Flame, iconClass: 'text-white' },
@@ -749,11 +792,14 @@ export default function Page() {
       : games.filter(game => game.category === filter || game.tags?.includes(filter))
 
   return (
-    <main
+    <>
+      <FirstVisitPopups />
+      <main
       className="
         relative
-        h-screen
-        overflow-hidden
+        min-h-screen
+        md:h-screen
+        md:overflow-hidden
         bg-[#05040F]
         text-white
         selection:bg-violet-500/30
@@ -849,10 +895,13 @@ export default function Page() {
                   <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {filters.map(({ label, icon: Icon, iconClass }) => {
                       const active = filter === label
+                      const buttonRef = useRef<HTMLButtonElement>(null)
+                      useCategoryFilterAnimation(buttonRef, active)
 
                       return (
                         <button
                           key={label}
+                          ref={buttonRef}
                           type="button"
                           onClick={() => setFilter(label)}
                           className={cn(
@@ -883,7 +932,7 @@ export default function Page() {
 
                 <motion.div
                   layout
-                  className="relative z-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 xl:gap-3.5"
+                  className="relative z-10 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 xl:gap-3.5"
                 >
                   {visible.map(game => (
                     <GameCard
@@ -904,7 +953,8 @@ export default function Page() {
                   relative
                   flex
                   flex-1
-                  min-h-[165px]
+                  min-h-[140px]
+                  sm:min-h-[165px]
                   flex-col
                   justify-center
                   overflow-hidden
@@ -965,17 +1015,21 @@ export default function Page() {
                     flex
                     h-full
                     w-full
-                    min-h-[165px]
+                    min-h-[140px]
+                    sm:min-h-[165px]
                     items-center
-                    px-8
-                    py-5
+                    px-5
+                    py-4
+                    sm:px-8
+                    sm:py-5
                   "
                 >
                   {/* RIGHT CONTENT */}
                   <div className="flex flex-col items-end ml-auto">
                     <p
                       className="
-                        text-[11px]
+                        text-[10px]
+                        sm:text-[11px]
                         font-bold
                         uppercase
                         tracking-[.2em]
@@ -986,34 +1040,29 @@ export default function Page() {
                     </p>
 
                     <h2
-                      className="mt-1 whitespace-nowrap bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-[32px] font-black leading-[0.92] tracking-tight text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] lg:text-[58px] xl:text-[62px]"
+                      className="mt-1 whitespace-nowrap bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-[24px] sm:text-[32px] md:text-[42px] lg:text-[58px] xl:text-[62px] font-black leading-[0.92] tracking-tight text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)]"
                     >
                       WELCOME BONUS
                     </h2>
 
-                    <p
-                      className="
-                        mt-2
-                        max-w-[220px]
-                        text-[13px]
-                        leading-5
-                        text-slate-300
-                        lg:text-[15px]
-                      "
-                    >
-                      Sign up now and get{' '}
-                      <strong className="text-[#F4C84E]">
-                        FREE COINS
-                      </strong>{' '}
-                      to start playing!
-                    </p>
+                   
 
-                    <div className="mt-5 flex gap-3">
+                    <div className="mt-4 sm:mt-5 flex gap-2 sm:gap-3">
                       <button
                         type="button"
+                        onClick={(e) => {
+                          showRewardPopup('+100,000 GC', document.body, e.clientX, e.clientY)
+                          createSparkBurst({
+                            x: e.clientX,
+                            y: e.clientY,
+                            count: 15,
+                            size: 5,
+                          })
+                        }}
                         className="
                           flex
-                          h-[48px]
+                          h-[42px]
+                          sm:h-[48px]
                           items-center
                           justify-center
                           rounded-[12px]
@@ -1022,8 +1071,10 @@ export default function Page() {
                           bg-gradient-to-r
                           from-amber-500
                           to-yellow-400
-                          px-6
-                          text-[12px]
+                          px-4
+                          sm:px-6
+                          text-[11px]
+                          sm:text-[12px]
                           font-bold
                           uppercase
                           tracking-widest
@@ -1040,15 +1091,18 @@ export default function Page() {
                         type="button"
                         className="
                           flex
-                          h-[48px]
+                          h-[42px]
+                          sm:h-[48px]
                           items-center
                           justify-center
                           rounded-[12px]
                           border
                           border-white/20
                           bg-white/10
-                          px-6
-                          text-[12px]
+                          px-4
+                          sm:px-6
+                          text-[11px]
+                          sm:text-[12px]
                           font-bold
                           uppercase
                           tracking-widest
@@ -1071,6 +1125,7 @@ export default function Page() {
         </div>
       </div>
     </main>
+    </>
   )
 }
 
