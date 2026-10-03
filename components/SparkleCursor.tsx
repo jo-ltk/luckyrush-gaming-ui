@@ -97,7 +97,7 @@ export default function SparkleCursor() {
       }
     };
 
-    const handleClick = (e: PointerEvent) => {
+    const handleClick = (e: MouseEvent) => {
       // Strong sparkle burst
       for (let i = 0; i < 28; i++) {
         createParticle(e.clientX, e.clientY, true);

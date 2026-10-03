@@ -811,9 +811,94 @@ function CategoryFilterButton({
   )
 }
 
+function WelcomeBonus({ mobile = false }: { mobile?: boolean }) {
+  return (
+    <section
+      id="welcome-bonus"
+      aria-labelledby="welcome-bonus-title"
+      className={cn(
+        'group relative isolate w-full shrink-0 overflow-hidden rounded-[18px] border border-[#43226A] bg-[#120B25] shadow-[0_10px_35px_rgba(0,0,0,.2)]',
+        mobile ? 'min-h-[180px]' : 'min-h-[150px] sm:min-h-[175px]'
+      )}
+    >
+      <Image
+        src="/welcome-bonus-gift-coins.png"
+        alt=""
+        fill
+        sizes={mobile ? 'calc(100vw - 32px)' : '(min-width: 1280px) 78vw, 100vw'}
+        priority={mobile}
+        className="object-cover object-left transition-transform duration-700 group-hover:scale-[1.025]"
+      />
+
+      <div className="absolute inset-0 bg-gradient-to-r from-[#12091F]/10 via-[#12091F]/55 to-[#12091F]/95" />
+      <div className="pointer-events-none absolute right-[12%] top-1/2 h-32 w-52 -translate-y-1/2 rounded-full bg-violet-500/[.08] blur-[55px]" />
+
+      <div
+        className={cn(
+          'relative z-10 flex w-full items-center',
+          mobile ? 'min-h-[180px] justify-end px-4 py-5' : 'min-h-[150px] justify-end px-5 py-4 sm:min-h-[175px] sm:px-8 sm:py-5'
+        )}
+      >
+        <div
+          className={cn(
+            'flex min-w-0 flex-col items-end text-right',
+            mobile ? 'w-full' : 'w-[min(72%,720px)] max-w-full'
+          )}
+        >
+          <p className={cn(
+            'font-bold uppercase tracking-[.18em] text-fuchsia-300',
+            mobile ? 'text-[9px]' : 'text-[10px] sm:text-[11px]'
+          )}>
+            A little something extra
+          </p>
+
+          <h2
+            id="welcome-bonus-title"
+            className={cn(
+              'mt-1 max-w-full bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text font-black leading-[0.92] tracking-tight text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] text-balance',
+              mobile ? 'text-[clamp(28px,8vw,38px)]' : 'text-[clamp(30px,3.4vw,62px)]'
+            )}
+          >
+            WELCOME BONUS
+          </h2>
+
+          <div className={cn(
+            'flex max-w-full flex-wrap justify-end',
+            mobile ? 'mt-4 gap-2' : 'mt-4 gap-2 sm:mt-5 sm:gap-3'
+          )}>
+            <button
+              type="button"
+              onClick={(e) => {
+                showRewardPopup('+100,000 GC', document.body, e.clientX, e.clientY)
+                createSparkBurst({ x: e.clientX, y: e.clientY, count: 15, size: 5 })
+              }}
+              className={cn(
+                'flex items-center justify-center rounded-[12px] border border-amber-400/30 bg-gradient-to-r from-amber-500 to-yellow-400 font-bold uppercase tracking-widest text-[#1a0a00] shadow-[0_0_18px_rgba(251,191,36,.25)] transition-all hover:brightness-110 hover:shadow-[0_0_25px_rgba(251,191,36,.38)] active:scale-[.98]',
+                mobile ? 'h-[40px] px-3 text-[10px]' : 'h-[42px] px-4 text-[11px] sm:h-[48px] sm:px-6 sm:text-[12px]'
+              )}
+            >
+              Claim Reward
+            </button>
+
+            <button
+              type="button"
+              className={cn(
+                'flex items-center justify-center rounded-[12px] border border-white/20 bg-white/10 font-bold uppercase tracking-widest text-white backdrop-blur transition-all hover:border-white/30 hover:bg-white/15 active:scale-[.98]',
+                mobile ? 'h-[40px] px-3 text-[10px]' : 'h-[42px] px-4 text-[11px] sm:h-[48px] sm:px-6 sm:text-[12px]'
+              )}
+            >
+              Learn More
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 function MobileHeader() { return <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[#08051A]/95 px-4 py-3 backdrop-blur-xl"><LuckyRushLogo height={36} className="h-9 w-[107px]" /><div className="flex items-center gap-1.5"><div className="rounded-lg border border-amber-400/20 bg-amber-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-amber-300">GC</span> 25,600</div><div className="rounded-lg border border-emerald-400/20 bg-emerald-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-emerald-300">SC</span> 12.50</div><button aria-label="Notifications" className="flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[.04] text-slate-300"><Bell className="size-4" /></button></div></header> }
 
-function MobileQuickNav() { const items = [{ label: 'Home', icon: Home, color: 'text-fuchsia-400' }, { label: 'Slots', icon: Zap, color: 'text-amber-400' }, { label: 'Live Casino', icon: Sparkles, color: 'text-cyan-400' }, { label: 'Table Games', icon: Trophy, color: 'text-yellow-400' }, { label: 'Promotions', icon: Gift, color: 'text-pink-400' }, { label: 'Search', icon: Search, color: 'text-slate-400' }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon, color }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-bold transition-all duration-300', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white shadow-[0_0_15px_rgba(217,70,239,.25)]' : 'border-white/10 bg-white/[.03] text-slate-400 hover:border-white/20 hover:bg-white/[.06]')}><Icon className={cn('size-5', index === 0 ? 'text-fuchsia-300 drop-shadow-[0_0_8px_rgba(217,70,239,.5)]' : color)} />{label}</button>)}</nav> }
+function MobileQuickNav() { const items = [{ label: 'Home', icon: Home, color: 'text-fuchsia-400' }, { label: 'Slots', icon: Zap, color: 'text-amber-400' }, { label: 'Live Casino', icon: Sparkles, color: 'text-cyan-400' }, { label: 'Jackpots', icon: Crown, color: 'text-yellow-400' }, { label: 'Promotions', icon: Gift, color: 'text-pink-400' }, { label: 'Search', icon: Search, color: 'text-slate-400' }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon, color }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-bold transition-all duration-300', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white shadow-[0_0_15px_rgba(217,70,239,.25)]' : 'border-white/10 bg-white/[.03] text-slate-400 hover:border-white/20 hover:bg-white/[.06]')}><Icon className={cn('size-5', index === 0 ? 'text-fuchsia-300 drop-shadow-[0_0_8px_rgba(217,70,239,.5)]' : color)} />{label}</button>)}</nav> }
 
 function MobileHero() {
   const [current, setCurrent] = useState(0)
@@ -998,7 +1083,7 @@ function MobileLobby() {
   const homeRef = useRef<HTMLDivElement>(null)
   const gamesRef = useRef<HTMLElement>(null)
   const promosRef = useRef<HTMLDivElement>(null)
-  const rewardsRef = useRef<HTMLElement>(null)
+  const rewardsRef = useRef<HTMLDivElement>(null)
 
   const scrollTo = (target: HTMLElement | null) => {
     target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -1076,6 +1161,9 @@ function MobileLobby() {
       </section>
 
       <div className="px-4">
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">
+          Mini Game Center
+        </p>
         <MiniGameCenter />
       </div>
 
@@ -1091,7 +1179,15 @@ function MobileLobby() {
               { label: 'Hold & Win', icon: Gem, iconClass: 'text-[#D7D3EA]' },
               { label: 'Slots', icon: Zap, iconClass: 'text-[#E8C15A]' },
               { label: 'Live Casino', icon: Sparkles, iconClass: 'text-[#C9B6FF]' },
-              { label: 'Table Games', icon: Trophy, iconClass: 'text-[#F0C14B]' },
+              { label: 'Bonus Buy', icon: Gift, iconClass: 'text-[#FF85C8]' },
+              { label: 'Megaways', icon: LayoutGrid, iconClass: 'text-[#80D9FF]' },
+              { label: 'Crash Games', icon: Zap, iconClass: 'text-[#FF6B4A]' },
+              { label: 'VIP Exclusives', icon: Crown, iconClass: 'text-[#FFD700]' },
+              { label: 'Multipliers', icon: TrendingUp, iconClass: 'text-[#A8FF78]' },
+              { label: 'Tournaments', icon: Trophy, iconClass: 'text-[#F0C14B]' },
+              { label: 'High Roller', icon: Gem, iconClass: 'text-[#9B59FF]' },
+              { label: 'Quick Wins', icon: Zap, iconClass: 'text-[#54FFB3]' },
+              { label: 'Featured', icon: Sparkles, iconClass: 'text-[#FFC3F0]' },
             ].map(({ label, icon: Icon, iconClass }) => (
               <CategoryFilterButton
                 key={label}
@@ -1111,61 +1207,13 @@ function MobileLobby() {
         <MobileGameSection title="New Games" games={games.slice(0, 6)} />
       </section>
 
-      <section
-        ref={rewardsRef}
-        className="group relative mx-4 min-h-[180px] scroll-mt-4 overflow-hidden rounded-[18px] border border-[#43226A] bg-[#120B25] shadow-[0_10px_35px_rgba(0,0,0,.25)]"
-      >
-        <Image
-          src="/welcome-bonus-gift-coins.png"
-          alt=""
-          fill
-          sizes="calc(100vw - 32px)"
-          className="object-cover object-left transition-transform duration-700 group-hover:scale-[1.025]"
-        />
+      <div ref={rewardsRef} className="scroll-mt-4">
+        <WelcomeBonus mobile />
+      </div>
 
-        <div className="absolute inset-0 bg-gradient-to-r from-[#12091F]/20 via-[#12091F]/60 to-[#12091F]/95" />
-
-        <div className="pointer-events-none absolute right-[10%] top-1/2 h-28 w-40 -translate-y-1/2 rounded-full bg-violet-500/[.10] blur-[45px]" />
-
-        <div className="relative z-10 flex min-h-[180px] w-full items-center justify-end px-4 py-5">
-          <div className="flex w-full flex-col items-end text-right">
-            <p className="text-[9px] font-bold uppercase tracking-[.16em] text-fuchsia-300">
-              A little something extra
-            </p>
-
-            <h2 className="mt-1 whitespace-nowrap bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-[25px] font-black leading-[0.92] tracking-tight text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)]">
-              WELCOME BONUS
-            </h2>
-
-            <div className="mt-4 flex w-full justify-end gap-2">
-              <button
-                type="button"
-                onClick={(e) => {
-                  showRewardPopup('+100,000 GC', document.body, e.clientX, e.clientY)
-                  createSparkBurst({
-                    x: e.clientX,
-                    y: e.clientY,
-                    count: 15,
-                    size: 5,
-                  })
-                }}
-                className="flex h-[40px] items-center justify-center rounded-[11px] border border-amber-400/30 bg-gradient-to-r from-amber-500 to-yellow-400 px-3 text-[10px] font-bold uppercase tracking-[.12em] text-[#1a0a00] shadow-[0_0_18px_rgba(251,191,36,.25)] transition-all hover:brightness-110 hover:shadow-[0_0_25px_rgba(251,191,36,.38)]"
-              >
-                Claim Reward
-              </button>
-
-              <button
-                type="button"
-                className="flex h-[40px] items-center justify-center rounded-[11px] border border-white/20 bg-white/10 px-3 text-[10px] font-bold uppercase tracking-[.12em] text-white backdrop-blur transition-all hover:border-white/30 hover:bg-white/15"
-              >
-                Learn More
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <Footer />
+      <div className="mt-5 shrink-0">
+        <Footer />
+      </div>
 
       <MobileBottomNav
         activeTab={activeTab}
@@ -1173,6 +1221,87 @@ function MobileLobby() {
         onMore={() => setMenuOpen(value => !value)}
         menuOpen={menuOpen}
       />
+    </div>
+  )
+}
+
+function RotatingPills({
+  filters,
+  activeFilter,
+  onSelect,
+}: {
+  filters: { label: string; icon: LucideIcon; iconClass: string }[]
+  activeFilter: string
+  onSelect: (label: string) => void
+}) {
+  const trackRef = useRef<HTMLDivElement>(null)
+  const animRef = useRef<gsap.core.Tween | null>(null)
+  const pausedRef = useRef(false)
+
+  // Duplicate pills for seamless infinite scroll
+  const doubled = [...filters, ...filters]
+
+  useEffect(() => {
+    const track = trackRef.current
+    if (!track) return
+
+    const totalWidth = track.scrollWidth / 2
+
+    animRef.current = gsap.fromTo(
+      track,
+      { x: 0 },
+      {
+        x: -totalWidth,
+        duration: filters.length * 3.2,
+        ease: 'none',
+        repeat: -1,
+        modifiers: {
+          x: gsap.utils.unitize(x => parseFloat(x) % totalWidth),
+        },
+      }
+    )
+
+    return () => {
+      animRef.current?.kill()
+    }
+  }, [filters.length])
+
+  const handleMouseEnter = () => {
+    if (animRef.current) {
+      animRef.current.pause()
+      pausedRef.current = true
+    }
+  }
+
+  const handleMouseLeave = () => {
+    if (animRef.current && pausedRef.current) {
+      animRef.current.resume()
+      pausedRef.current = false
+    }
+  }
+
+  return (
+    <div
+      className="relative overflow-hidden flex-1 min-w-0"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {/* Fade edges */}
+      <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-8 z-10 bg-gradient-to-r from-[#05040F] to-transparent" />
+      <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-8 z-10 bg-gradient-to-l from-[#05040F] to-transparent" />
+
+      <div ref={trackRef} className="flex gap-2 whitespace-nowrap will-change-transform">
+        {doubled.map(({ label, icon: Icon, iconClass }, i) => (
+          <CategoryFilterButton
+            key={`${label}-${i}`}
+            label={label}
+            Icon={Icon}
+            iconClass={iconClass}
+            active={activeFilter === label}
+            onClick={() => onSelect(label)}
+          />
+        ))}
+      </div>
     </div>
   )
 }
@@ -1190,7 +1319,17 @@ export default function Page() {
     { label: 'Popular', icon: Gamepad2, iconClass: 'text-[#C9C6D8]' },
     { label: 'Slots', icon: Zap, iconClass: 'text-[#E8C15A]' },
     { label: 'Live Casino', icon: Sparkles, iconClass: 'text-[#C9B6FF]' },
-    { label: 'Table Games', icon: Trophy, iconClass: 'text-[#F0C14B]' },
+    { label: 'Bonus Buy', icon: Gift, iconClass: 'text-[#FF85C8]' },
+    { label: 'Megaways', icon: LayoutGrid, iconClass: 'text-[#80D9FF]' },
+    { label: 'Crash Games', icon: Zap, iconClass: 'text-[#FF6B4A]' },
+    { label: 'VIP Exclusives', icon: Crown, iconClass: 'text-[#FFD700]' },
+    { label: 'Multipliers', icon: TrendingUp, iconClass: 'text-[#A8FF78]' },
+    { label: 'Cluster Pays', icon: Gamepad2, iconClass: 'text-[#FF9F43]' },
+    { label: 'Tournaments', icon: Trophy, iconClass: 'text-[#F0C14B]' },
+    { label: 'Daily Picks', icon: Star, iconClass: 'text-[#FF6ED2]' },
+    { label: 'High Roller', icon: Gem, iconClass: 'text-[#9B59FF]' },
+    { label: 'Quick Wins', icon: Zap, iconClass: 'text-[#54FFB3]' },
+    { label: 'Featured', icon: Sparkles, iconClass: 'text-[#FFC3F0]' },
   ]
 
   const visible =
@@ -1205,7 +1344,7 @@ export default function Page() {
       className="
         relative
         min-h-screen
-        md:h-screen
+        md:h-dvh
         md:overflow-hidden
         bg-[#05040F]
         text-white
@@ -1278,14 +1417,14 @@ export default function Page() {
           </div>
         </aside>
 
-        <div className="ml-[264px] mr-[280px] h-screen overflow-hidden pt-[68px] lg:mr-[295px] xl:mr-[315px] 2xl:mr-[335px]">
-          <div className="flex h-full min-h-0 w-full flex-col overflow-y-auto overscroll-contain px-4 py-4 xl:px-6 xl:py-5">
+        <div className="fixed bottom-0 left-[264px] right-[280px] top-[68px] z-10 overflow-y-auto overscroll-contain lg:right-[295px] xl:right-[315px] 2xl:right-[335px]">
+          <div className="min-h-full w-full px-4 py-4 xl:px-6 xl:py-5">
 
             {/* ================================================= */}
             {/* MAIN CONTENT */}
             {/* ================================================= */}
 
-            <div className="flex flex-col gap-4 xl:gap-5">
+            <div className="min-w-0 space-y-4 pb-6 xl:space-y-5 xl:pb-8">
 
               {/* HERO */}
               <Hero />
@@ -1299,26 +1438,11 @@ export default function Page() {
 
               <section className="relative">
                 <div className="relative z-10 mb-3 flex items-center gap-3">
-                  <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                    {filters.map(({ label, icon: Icon, iconClass }) => (
-                      <CategoryFilterButton
-                        key={label}
-                        label={label}
-                        Icon={Icon}
-                        iconClass={iconClass}
-                        active={filter === label}
-                        onClick={() => setFilter(label)}
-                      />
-                    ))}
-                  </div>
-
-                  <button
-                    type="button"
-                    className="flex shrink-0 items-center gap-1 text-[13px] font-bold text-[#B7B3C9] transition-colors hover:text-white"
-                  >
-                    View All Games
-                    <ChevronRight className="size-4" />
-                  </button>
+                  <RotatingPills
+                    filters={filters}
+                    activeFilter={filter}
+                    onSelect={setFilter}
+                  />
                 </div>
 
                 <motion.div
@@ -1338,180 +1462,11 @@ export default function Page() {
               {/* WELCOME BONUS */}
               {/* ================================================= */}
 
-              <section
-                className="
-                  group
-                  relative
-                  flex
-                  min-h-[140px]
-                  sm:min-h-[165px]
-                  flex-col
-                  justify-center
-                  overflow-hidden
-                  rounded-[18px]
-                  border
-                  border-[#43226A]
-                  bg-[#120B25]
-                  shadow-[0_10px_35px_rgba(0,0,0,.2)]
-                "
-              >
-                {/* Background image */}
-                <Image
-                  src="/welcome-bonus-gift-coins.png"
-                  alt=""
-                  fill
-                  className="
-                    object-cover
-                    object-left
-                    transition-transform
-                    duration-700
-                    group-hover:scale-[1.025]
-                  "
-                />
+              <WelcomeBonus />
 
-                {/* Main overlay */}
-                <div
-                  className="
-                    absolute
-                    inset-0
-                    bg-gradient-to-r
-                    from-[#12091F]/10
-                    via-[#12091F]/45
-                    to-[#12091F]/90
-                  "
-                />
-
-                {/* Purple glow */}
-                <div
-                  className="
-                    pointer-events-none
-                    absolute
-                    right-[20%]
-                    top-1/2
-                    h-32
-                    w-52
-                    -translate-y-1/2
-                    rounded-full
-                    bg-violet-500/[.08]
-                    blur-[55px]
-                  "
-                />
-
-                {/* Content */}
-                <div
-                  className="
-                    relative
-                    z-10
-                    flex
-                    h-full
-                    w-full
-                    min-h-[140px]
-                    sm:min-h-[165px]
-                    items-center
-                    px-5
-                    py-4
-                    sm:px-8
-                    sm:py-5
-                  "
-                >
-                  {/* RIGHT CONTENT */}
-                  <div className="flex flex-col items-end ml-auto">
-                    <p
-                      className="
-                        text-[10px]
-                        sm:text-[11px]
-                        font-bold
-                        uppercase
-                        tracking-[.2em]
-                        text-fuchsia-300
-                      "
-                    >
-                      A little something extra
-                    </p>
-
-                    <h2
-                      className="mt-1 whitespace-nowrap bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-[24px] sm:text-[32px] md:text-[42px] lg:text-[58px] xl:text-[62px] font-black leading-[0.92] tracking-tight text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)]"
-                    >
-                      WELCOME BONUS
-                    </h2>
-
-
-
-                    <div className="mt-4 sm:mt-5 flex gap-2 sm:gap-3">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          showRewardPopup('+100,000 GC', document.body, e.clientX, e.clientY)
-                          createSparkBurst({
-                            x: e.clientX,
-                            y: e.clientY,
-                            count: 15,
-                            size: 5,
-                          })
-                        }}
-                        className="
-                          flex
-                          h-[42px]
-                          sm:h-[48px]
-                          items-center
-                          justify-center
-                          rounded-[12px]
-                          border
-                          border-amber-400/30
-                          bg-gradient-to-r
-                          from-amber-500
-                          to-yellow-400
-                          px-4
-                          sm:px-6
-                          text-[11px]
-                          sm:text-[12px]
-                          font-bold
-                          uppercase
-                          tracking-widest
-                          text-[#1a0a00]
-                          shadow-[0_0_18px_rgba(251,191,36,.25)]
-                          transition-all
-                          hover:brightness-110
-                          hover:shadow-[0_0_25px_rgba(251,191,36,.38)]
-                        "
-                      >
-                        Claim Reward
-                      </button>
-                      <button
-                        type="button"
-                        className="
-                          flex
-                          h-[42px]
-                          sm:h-[48px]
-                          items-center
-                          justify-center
-                          rounded-[12px]
-                          border
-                          border-white/20
-                          bg-white/10
-                          px-4
-                          sm:px-6
-                          text-[11px]
-                          sm:text-[12px]
-                          font-bold
-                          uppercase
-                          tracking-widest
-                          text-white
-                          backdrop-blur
-                          transition-all
-                          hover:bg-white/15
-                          hover:border-white/30
-                        "
-                      >
-                        Learn More
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              {/* FOOTER */}
-              <Footer />
+              <div className="mt-5">
+                <Footer />
+              </div>
             </div>
 
           </div>
