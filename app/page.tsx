@@ -262,10 +262,10 @@ function LatestWins() {
     >
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Live activity</p>
-          <h2 className="mt-1 text-base font-bold text-white">Latest Wins</h2>
+          <p className="text-[14px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Live activity</p>
+          <h2 className="mt-1 text-xl font-bold text-white">Latest Wins</h2>
         </div>
-        <button className="text-[11px] font-bold text-slate-500 hover:text-fuchsia-300">View All</button>
+        <button className="text-[15px] font-bold text-slate-500 hover:text-fuchsia-300">View All</button>
       </div>
       <div className="flex flex-col gap-2.5">
         {wins.map(({ user, amount, time, avatar }) => (
@@ -274,10 +274,10 @@ function LatestWins() {
               <Image src={avatar} alt="" fill className="object-cover" />
             </div>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[11px] font-semibold text-white">{user}</p>
-              <p className="text-[10px] font-bold text-amber-300">{amount}</p>
+              <p className="truncate text-[15px] font-semibold text-white">{user}</p>
+              <p className="text-[14px] font-bold text-amber-300">{amount}</p>
             </div>
-            <p className="self-start pt-0.5 text-[9px] text-slate-600">{time}</p>
+            <p className="self-start pt-0.5 text-[13px] text-slate-600">{time}</p>
           </div>
         ))}
       </div>
@@ -303,12 +303,12 @@ function PromoCards() {
   const items = [
     { title: 'Daily Rewards', text: 'Log in every day and claim exciting rewards!', icon: Gift, color: 'from-fuchsia-500/25 to-violet-500/5', background: '/daily-rewards-banner.png', accent: 'gold', align: 'right' },
     { title: 'New Games Weekly', text: 'Fresh games, new experiences every week.', icon: Sparkles, color: 'from-cyan-500/20 to-blue-500/5', background: '/new-games-banner.png', accent: 'cyan', align: 'left' },
-    { title: 'Free-to-Play', text: 'Play your favorite games with GC & SC.', icon: Zap, color: 'from-amber-500/20 to-orange-500/5', background: '/free-to-play-banner.png', accent: 'gold', align: 'right' },
+    { title: 'Free-to-Play', text: 'Play your favorite games with GC & SC', icon: Zap, color: 'from-amber-500/20 to-orange-500/5', background: '/free-to-play-banner.png', accent: 'gold', align: 'right' },
+    { title: 'VIP Club', text: 'Unlock exclusive rewards and special perks', icon: Crown, color: 'from-yellow-500/20 to-amber-500/5', background: '/vip-club-golden-crown.png', accent: 'gold', align: 'right' },
   ]
   return (
-    <motion.div initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.18 } } }} className="grid grid-cols-3 gap-3">
+    <motion.div initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.18 } } }} className="grid grid-cols-4 gap-3">
       {items.map(item => {
-        const Icon = item.icon
         return (
           <motion.div
             key={item.title}
@@ -316,7 +316,7 @@ function PromoCards() {
             whileHover={{ y: -3 }}
             transition={{ duration: 0.25 }}
             className={cn(
-              'group relative flex min-h-[96px] items-center gap-3 overflow-hidden rounded-xl border p-3.5 transition-shadow hover:shadow-[0_8px_25px_rgba(168,85,247,.18)]',
+              'group relative flex h-[120px] items-start overflow-hidden rounded-xl border p-4 transition-shadow hover:shadow-[0_8px_25px_rgba(168,85,247,.18)]',
               item.background
                 ? item.accent === 'cyan'
                   ? 'border-cyan-300/40 hover:border-cyan-200/60'
@@ -344,16 +344,9 @@ function PromoCards() {
                 />
               </>
             )}
-            <div className={cn('relative z-10 flex items-center gap-3', item.align === 'right' && 'ml-auto w-[58%] justify-end')}>
-              {item.align !== 'right' && (
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-fuchsia-200 transition-transform duration-200 group-hover:scale-110">
-                  <Icon className="size-4" />
-                </div>
-              )}
-              <div>
-                <p className="text-xs font-bold text-white drop-shadow-[0_1px_6px_rgba(0,0,0,.55)]">{item.title}</p>
-                <p className={cn('mt-1 text-[10px] leading-4', item.background ? 'text-white/85' : 'text-slate-400')}>{item.text}</p>
-              </div>
+            <div className="relative z-10 flex w-full flex-col items-start">
+              <p className="text-2xl sm:text-3xl font-black leading-[0.92] tracking-tight text-white drop-shadow-[0_3px_5px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(191,126,255,0.4)]">{item.title}</p>
+              <p className={cn('mt-2 text-lg leading-5', item.background ? 'text-white/90' : 'text-slate-400')}>{item.text}</p>
             </div>
           </motion.div>
         )
@@ -365,7 +358,7 @@ function PromoCards() {
 function GameCard({ game }: { game: Game }) {
   return (
     <motion.article initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32 }} whileHover={{ y: -4 }} className="group relative min-w-0">
-      <div className={cn('relative aspect-[1.08/1] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br shadow-[0_10px_24px_rgba(0,0,0,.28)] transition duration-300 group-hover:shadow-[0_10px_28px_rgba(168,85,247,.3)]', game.colors)}>
+      <div className={cn('relative aspect-[1.6/1] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br shadow-[0_10px_24px_rgba(0,0,0,.28)] transition duration-300 group-hover:shadow-[0_10px_28px_rgba(168,85,247,.3)]', game.colors)}>
         {game.cover ? (
           <Image src={game.cover} alt={game.name} fill className="object-cover" />
         ) : (
@@ -387,8 +380,8 @@ function GameCard({ game }: { game: Game }) {
           <Heart className="size-3.5" />
         </button>
       </div>
-      <p className="mt-2 truncate text-[11px] font-bold text-slate-300">{game.name}</p>
-      <p className="mt-0.5 text-[9px] uppercase tracking-wider text-slate-600">Slots · Play now</p>
+      <p className="mt-2 truncate text-[13px] font-bold text-slate-300">{game.name}</p>
+      <p className="mt-0.5 text-[11px] uppercase tracking-wider text-slate-600">Slots · Play now</p>
     </motion.article>
   )
 }
@@ -791,57 +784,16 @@ export default function Page() {
                       h-full
                       w-full
                       min-h-[220px]
-                      flex-col
-                      items-start
-                      justify-center
-                      gap-5
-                      pl-[22%]
-                      pr-6
+                      items-center
+                      px-8
                       py-6
                     "
                   >
-                    <div className="flex flex-col items-start">
-                      <p
-                        className="
-                          text-[11px]
-                          font-bold
-                          uppercase
-                          tracking-[.2em]
-                          text-fuchsia-300
-                        "
-                      >
-                        A little something extra
-                      </p>
-
-                      <h2
-                        className="mt-1 text-[32px] lg:text-[58px] xl:text-[62px] font-black leading-[0.92] tracking-tight select-none bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] drop-shadow-[0_0_18px_rgba(245,181,32,0.4)] whitespace-nowrap"
-                      >
-                        WELCOME BONUS
-                      </h2>
-
-                      <p
-                        className="
-                          mt-2
-                          max-w-[220px]
-                          text-[13px]
-                          lg:text-[15px]
-                          leading-5
-                          text-slate-300
-                        "
-                      >
-                        Sign up now and get{' '}
-                        <strong className="text-[#F4C84E]">
-                          FREE COINS
-                        </strong>{' '}
-                        to start playing!
-                      </p>
-                    </div>
-
-                    {/* BONUS VALUES + CLAIM REWARD */}
-                    <div className="flex flex-wrap items-center gap-4">
+                    {/* CENTERED BONUS BLOCK */}
+                    <div className="flex shrink-0 items-center gap-5 mx-auto">
 
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-[24px] lg:text-[26px] font-bold text-[#F5CB4E]">
+                        <span className="text-[24px] font-bold text-[#F5CB4E] lg:text-[26px]">
                           100,000
                         </span>
 
@@ -850,7 +802,7 @@ export default function Page() {
                             text-[9px]
                             font-bold
                             uppercase
-                            tracking-[.2em]
+                            tracking-[.15em]
                             text-white/60
                           "
                         >
@@ -863,7 +815,7 @@ export default function Page() {
                       </span>
 
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-[24px] lg:text-[26px] font-bold text-[#E678FF]">
+                        <span className="text-[24px] font-bold text-[#E678FF] lg:text-[26px]">
                           10
                         </span>
 
@@ -872,7 +824,7 @@ export default function Page() {
                             text-[9px]
                             font-bold
                             uppercase
-                            tracking-[.2em]
+                            tracking-[.15em]
                             text-white/60
                           "
                         >
@@ -883,7 +835,6 @@ export default function Page() {
                       <button
                         type="button"
                         className="
-                          ml-2
                           h-[45px]
                           rounded-[12px]
                           border
@@ -907,6 +858,44 @@ export default function Page() {
                       >
                         Claim Reward
                       </button>
+                    </div>
+
+                    {/* RIGHT CONTENT */}
+                    <div className="flex flex-col items-end ml-auto">
+                      <p
+                        className="
+                          text-[11px]
+                          font-bold
+                          uppercase
+                          tracking-[.2em]
+                          text-fuchsia-300
+                        "
+                      >
+                        A little something extra
+                      </p>
+
+                      <h2
+                        className="mt-1 whitespace-nowrap bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-[32px] font-black leading-[0.92] tracking-tight text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] lg:text-[58px] xl:text-[62px]"
+                      >
+                        WELCOME BONUS
+                      </h2>
+
+                      <p
+                        className="
+                          mt-2
+                          max-w-[220px]
+                          text-[13px]
+                          leading-5
+                          text-slate-300
+                          lg:text-[15px]
+                        "
+                      >
+                        Sign up now and get{' '}
+                        <strong className="text-[#F4C84E]">
+                          FREE COINS
+                        </strong>{' '}
+                        to start playing!
+                      </p>
                     </div>
                   </div>
                 </section>
