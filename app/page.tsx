@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -145,20 +145,60 @@ function Sidebar() {
   )
 }
 
+const heroSlides = [
+  { src: '/hero-neon-casino-adventure.png', alt: 'Lucky Rush Neon Casino Adventure', position: 'object-[72%_center]' },
+  { src: '/hero-fortune-wheel-extravaganza.png', alt: 'Neon Casino Fortune Wheel Extravaganza', position: 'object-center' },
+  { src: '/hero-neon-tiger-jackpot.png', alt: 'Neon Tiger Jackpot Celebration', position: 'object-[60%_center]' },
+]
+
 function Hero() {
+  const [current, setCurrent] = useState(0)
+
+  useEffect(() => {
+    const t = setInterval(() => setCurrent(i => (i + 1) % heroSlides.length), 4500)
+    return () => clearInterval(t)
+  }, [])
+
   return (
     <div className="relative min-h-[292px] overflow-hidden rounded-[18px] border border-[#30234A] bg-[#100A24] shadow-[0_12px_40px_rgba(0,0,0,.22)]">
-      <Image src="/luckyrush-hero.png" alt="Neon casino jackpot night with Miami skyline, slot machine, and gold coins" fill className="object-cover object-[72%_center] opacity-95" priority />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#110b27] via-[#1a0e3b]/70 to-transparent" />
+      {/* Carousel images */}
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, scale: 1.04 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.97 }}
+          transition={{ duration: 0.9, ease: 'easeInOut' }}
+          className="absolute inset-0"
+        >
+          <Image
+            src={heroSlides[current].src}
+            alt={heroSlides[current].alt}
+            fill
+            className={cn('object-cover opacity-95', heroSlides[current].position)}
+            priority
+          />
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0d0820] via-[#1a0e3b]/75 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0d0820]/60 via-transparent to-transparent" />
+
+      {/* Content */}
       <div className="relative z-10 flex h-full min-h-[292px] flex-col justify-center px-9 py-8">
         <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.25em] text-fuchsia-300">
           <Sparkles className="size-3" /> Your lucky era starts here
         </p>
-        <h1 className="max-w-[300px] text-[42px] font-bold leading-[.94] tracking-tight text-white">
-          PLAY. SPIN.<br />
-          <span className="bg-gradient-to-r from-fuchsia-300 via-pink-400 to-amber-300 bg-clip-text text-transparent">GET REWARDED.</span>
+        <h1 className="w-fit text-[46px] sm:text-[52px] lg:text-[58px] xl:text-[66px] 2xl:text-[72px] font-black leading-[0.92] tracking-tight select-none">
+          <span className="block bg-gradient-to-b from-white via-[#F5EDFF] to-[#BF7EFF] bg-clip-text text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] drop-shadow-[0_0_18px_rgba(191,126,255,0.4)] whitespace-nowrap">
+            PLAY. SPIN.
+          </span>
+          <span className="block bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] drop-shadow-[0_0_18px_rgba(245,181,32,0.4)] whitespace-nowrap">
+            GET REWARDED.
+          </span>
         </h1>
-        <p className="mt-3 max-w-[265px] text-xs leading-5 text-slate-300">
+        <p className="mt-3 max-w-[280px] text-md leading-5 text-slate-300">
           Thousands of games. Daily rewards.<br />
           New favorites every week.
         </p>
@@ -189,6 +229,23 @@ function Hero() {
           <button className="rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur">
             View Games
           </button>
+        </div>
+
+        {/* Dot indicators */}
+        <div className="absolute bottom-4 right-6 flex items-center gap-2">
+          {heroSlides.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrent(i)}
+              className={cn(
+                'rounded-full transition-all duration-500',
+                i === current
+                  ? 'h-2 w-6 bg-fuchsia-400 shadow-[0_0_8px_rgba(232,121,249,.7)]'
+                  : 'size-2 bg-white/30 hover:bg-white/55',
+              )}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
         </div>
       </div>
     </div>
@@ -340,8 +397,105 @@ function MobileHeader() { return <header className="sticky top-0 z-40 flex items
 
 function MobileQuickNav() { const items = [{ label: 'Home', icon: Home }, { label: 'Slots', icon: Zap }, { label: 'Live Casino', icon: Sparkles }, { label: 'Table Games', icon: Trophy }, { label: 'Promotions', icon: Gift }, { label: 'Search', icon: Search }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-bold', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white' : 'border-white/10 bg-white/[.03] text-slate-400')}><Icon className="size-5" />{label}</button>)}</nav> }
 
-function MobileHero() { return <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="relative mx-4 min-h-[220px] overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#160c32]"><Image src="/luckyrush-hero.png" alt="Neon casino jackpot night with Miami skyline, slot machine, and gold coins" fill className="object-cover object-[72%_center] opacity-90" priority /><div className="absolute inset-0 bg-gradient-to-r from-[#110b27] via-[#1a0e3b]/80 to-transparent" /><div className="relative z-10 flex min-h-[220px] flex-col justify-center px-5 py-6"><p className="text-[9px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Your lucky era starts here</p><h1 className="mt-2 text-[32px] font-bold leading-[.94] tracking-tight text-white">PLAY. SPIN.<br /><span className="bg-gradient-to-r from-fuchsia-300 via-pink-400 to-amber-300 bg-clip-text text-transparent">GET REWARDED.</span></h1><p className="mt-2 max-w-[180px] text-[11px] leading-4 text-slate-300">Thousands of games. Daily rewards.</p><button className="mt-4 w-fit rounded-lg bg-gradient-to-r from-fuchsia-500 to-pink-500 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg">Play Now <ChevronRight className="ml-1 inline size-3" /></button></div><div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5"><span className="h-1.5 w-5 rounded-full bg-fuchsia-400" /><span className="size-1.5 rounded-full bg-white/40" /><span className="size-1.5 rounded-full bg-white/40" /></div></motion.section> }
+function MobileHero() {
+  const [current, setCurrent] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => setCurrent(i => (i + 1) % heroSlides.length), 4500)
+    return () => clearInterval(t)
+  }, [])
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative mx-4 min-h-[220px] overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#160c32]"
+    >
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          transition={{ duration: 0.85, ease: 'easeInOut' }}
+          className="absolute inset-0"
+        >
+          <Image src={heroSlides[current].src} alt={heroSlides[current].alt} fill className={cn('object-cover opacity-90', heroSlides[current].position)} priority />
+        </motion.div>
+      </AnimatePresence>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#110b27] via-[#1a0e3b]/80 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0d0820]/55 via-transparent to-transparent" />
+      <div className="relative z-10 flex min-h-[220px] flex-col justify-center px-5 py-6">
+        <p className="text-[9px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Your lucky era starts here</p>
+        <h1 className="mt-2 text-[32px] xs:text-[36px] font-black leading-[0.92] tracking-tight select-none">
+          <span className="block bg-gradient-to-b from-white via-[#F5EDFF] to-[#BF7EFF] bg-clip-text text-transparent drop-shadow-[0_3px_4px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(191,126,255,0.4)] whitespace-nowrap">PLAY. SPIN.</span>
+          <span className="block bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-transparent drop-shadow-[0_3px_4px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(245,181,32,0.4)] whitespace-nowrap">GET REWARDED.</span>
+        </h1>
+        <p className="mt-2 max-w-[180px] text-[11px] leading-4 text-slate-300">Thousands of games. Daily rewards.</p>
+        <button className="mt-4 w-fit rounded-lg bg-gradient-to-r from-fuchsia-500 to-pink-500 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg">Play Now <ChevronRight className="ml-1 inline size-3" /></button>
+      </div>
+      <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+        {heroSlides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={cn(
+              'rounded-full transition-all duration-500',
+              i === current ? 'h-1.5 w-5 bg-fuchsia-400 shadow-[0_0_6px_rgba(232,121,249,.7)]' : 'size-1.5 bg-white/35 hover:bg-white/55',
+            )}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
+      </div>
+    </motion.section>
+  )
+}
 
+function WelcomeBonusBanner() {
+  const [current, setCurrent] = useState(0)
+  useEffect(() => {
+    const t = setInterval(() => setCurrent(i => (i + 1) % heroSlides.length), 4500)
+    return () => clearInterval(t)
+  }, [])
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="relative mx-4 min-h-[220px] overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#160c32]"
+    >
+      <AnimatePresence initial={false}>
+        <motion.div
+          key={current}
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.96 }}
+          transition={{ duration: 0.85, ease: 'easeInOut' }}
+          className="absolute inset-0"
+        >
+          <Image src={heroSlides[current].src} alt={heroSlides[current].alt} fill className={cn('object-cover opacity-90', heroSlides[current].position)} priority />
+        </motion.div>
+      </AnimatePresence>
+      <div className="absolute inset-0 bg-gradient-to-r from-[#110b27] via-[#1a0e3b]/80 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0d0820]/55 via-transparent to-transparent" />
+      <div className="relative z-10 flex min-h-[220px] flex-col justify-center px-5 py-6">
+        <p className="text-[9px] font-bold uppercase tracking-[.2em] text-fuchsia-300">A little something extra</p>
+        <h2 className="mt-2 text-[32px] font-black leading-[0.92] tracking-tight select-none">
+          <span className="block bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-transparent drop-shadow-[0_3px_4px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(245,181,32,0.4)] whitespace-nowrap">WELCOME BONUS</span>
+        </h2>
+        <p className="mt-2 max-w-[180px] text-[11px] leading-4 text-slate-300">Sign up now and get <strong className="text-[#F4C84E]">FREE COINS</strong> to start playing!</p>
+        <button className="mt-4 w-fit rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[#1a0a00] shadow-lg">Claim Reward <ChevronRight className="ml-1 inline size-3" /></button>
+      </div>
+      <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
+        {heroSlides.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={cn('rounded-full transition-all duration-500', i === current ? 'h-1.5 w-5 bg-amber-400 shadow-[0_0_6px_rgba(251,191,36,.7)]' : 'size-1.5 bg-white/35 hover:bg-white/55')}
+            aria-label={`Go to slide ${i + 1}`}
+          />
+        ))}
+      </div>
+    </motion.section>
+  )
+}
 function MobilePromos() {
   const items = [
     { title: 'Daily Rewards', text: 'Claim every day', icon: Gift, background: '/daily-rewards-banner.png', accent: 'gold', align: 'right' },
@@ -404,7 +558,7 @@ function MobileGameSection({ title, games: sectionGames }: { title: string; game
 
 function MobileBottomNav() { const items = [{ label: 'Home', icon: Home }, { label: 'Games', icon: LayoutGrid }, { label: 'Rewards', icon: Crown }, { label: 'Promotions', icon: Gift }, { label: 'More', icon: Menu }]; return <nav className="fixed inset-x-0 bottom-0 z-50 flex h-[68px] items-end justify-around border-t border-white/10 bg-[#08051A]/95 px-2 pb-2 pt-1 backdrop-blur-xl">{items.map(({ label, icon: Icon }, i) => <button key={label} className={cn('flex min-w-[56px] flex-col items-center gap-1 rounded-xl px-2 py-1 text-[10px] font-bold', i === 2 ? 'bg-gradient-to-t from-fuchsia-600 to-violet-600 text-white shadow-[0_0_20px_rgba(217,70,239,.45)]' : 'text-slate-500')}><Icon className="size-5" />{label}</button>)}</nav> }
 
-function MobileLobby() { return <div className="flex flex-col gap-5 pb-24 md:hidden"><MobileHeader /><MobileHero /><MobileQuickNav /><MobilePromos /><div className="px-8"><p className="mb-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p><LuckyMatchGame /></div><MobileGameSection title="Popular Games" games={games.slice(0, 6)} /><MobileGameSection title="Featured Slots" games={games.slice(6, 12)} /><MobileGameSection title="Live Casino" games={games.slice(2, 8)} /><MobileBottomNav /></div> }
+function MobileLobby() { return <div className="flex flex-col gap-5 pb-24 md:hidden"><MobileHeader /><MobileHero /><WelcomeBonusBanner /><MobileQuickNav /><MobilePromos /><div className="px-8"><p className="mb-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p><LuckyMatchGame /></div><MobileGameSection title="Popular Games" games={games.slice(0, 6)} /><MobileGameSection title="Featured Slots" games={games.slice(6, 12)} /><MobileGameSection title="Live Casino" games={games.slice(2, 8)} /><MobileBottomNav /></div> }
 
 export default function Page() {
   const [filter, setFilter] = useState('For You')
@@ -637,45 +791,42 @@ export default function Page() {
                       h-full
                       w-full
                       min-h-[220px]
-                      items-center
-                      justify-between
-                      gap-8
-                      pl-[27%]
+                      flex-col
+                      items-start
+                      justify-center
+                      gap-5
+                      pl-[22%]
                       pr-6
                       py-6
                     "
                   >
-                    <div>
+                    <div className="flex flex-col items-start">
                       <p
                         className="
-                          text-[9px]
+                          text-[11px]
                           font-bold
                           uppercase
-                          tracking-[.25em]
-                          text-[#F1C85B]
+                          tracking-[.2em]
+                          text-fuchsia-300
                         "
                       >
                         A little something extra
                       </p>
 
                       <h2
-                        className="
-                          mt-1
-                          text-[25px]
-                          font-bold
-                          tracking-tight
-                          text-white
-                          drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]
-                        "
+                        className="mt-1 text-[32px] lg:text-[58px] xl:text-[62px] font-black leading-[0.92] tracking-tight select-none bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-transparent drop-shadow-[0_4px_6px_rgba(0,0,0,0.95)] drop-shadow-[0_0_18px_rgba(245,181,32,0.4)] whitespace-nowrap"
                       >
                         WELCOME BONUS
                       </h2>
 
                       <p
                         className="
-                          mt-1
-                          text-[11px]
-                          text-[#C9C1DA]
+                          mt-2
+                          max-w-[220px]
+                          text-[13px]
+                          lg:text-[15px]
+                          leading-5
+                          text-slate-300
                         "
                       >
                         Sign up now and get{' '}
@@ -686,18 +837,17 @@ export default function Page() {
                       </p>
                     </div>
 
-                    {/* BONUS VALUES */}
-                    <div className="flex shrink-0 items-center gap-4">
+                    {/* BONUS VALUES + CLAIM REWARD */}
+                    <div className="flex flex-wrap items-center gap-4">
 
-                      <div className="text-center">
-                        <p className="text-[22px] font-bold text-[#F5CB4E]">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-[24px] lg:text-[26px] font-bold text-[#F5CB4E]">
                           100,000
-                        </p>
+                        </span>
 
-                        <p
+                        <span
                           className="
-                            mt-[-2px]
-                            text-[8px]
+                            text-[9px]
                             font-bold
                             uppercase
                             tracking-[.2em]
@@ -705,22 +855,21 @@ export default function Page() {
                           "
                         >
                           GC
-                        </p>
+                        </span>
                       </div>
 
                       <span className="text-xl font-bold text-[#E99AFF]">
                         +
                       </span>
 
-                      <div className="text-center">
-                        <p className="text-[22px] font-bold text-[#E678FF]">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-[24px] lg:text-[26px] font-bold text-[#E678FF]">
                           10
-                        </p>
+                        </span>
 
-                        <p
+                        <span
                           className="
-                            mt-[-2px]
-                            text-[8px]
+                            text-[9px]
                             font-bold
                             uppercase
                             tracking-[.2em]
@@ -728,7 +877,7 @@ export default function Page() {
                           "
                         >
                           SC
-                        </p>
+                        </span>
                       </div>
 
                       <button
