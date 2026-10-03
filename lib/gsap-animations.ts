@@ -891,7 +891,7 @@ export function usePageLoadEntrance() {
 // HERO SUBTLE MOTION
 // ============================================================
 
-export function useHeroMotion(heroRef: React.RefObject<HTMLElement>) {
+export function useHeroMotion(heroRef: Ref<HTMLElement>) {
   const ctxRef = useRef<gsap.Context | null>(null)
 
   useEffect(() => {

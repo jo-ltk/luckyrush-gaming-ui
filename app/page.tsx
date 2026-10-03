@@ -518,7 +518,17 @@ function MiniGameCenter() {
   )
 }
 
-function PromoCard({ item }: { item: typeof items[number] }) {
+type PromoItem = {
+  title: string
+  text: string
+  icon: any
+  color?: string
+  background?: string
+  accent?: 'gold' | 'cyan'
+  align?: 'left' | 'right'
+}
+
+function PromoCard({ item }: { item: PromoItem }) {
   const cardRef = useRef<HTMLDivElement>(null)
   usePromoCardAnimation(cardRef)
   const Icon = item.icon
@@ -584,7 +594,7 @@ function PromoCard({ item }: { item: typeof items[number] }) {
 }
 
 function PromoCards() {
-  const items = [
+  const items: PromoItem[] = [
     { title: 'Daily Rewards', text: 'Log in every day and claim exciting rewards!', icon: Gift, color: 'from-fuchsia-500/25 to-violet-500/5', background: '/daily-rewards-banner.png', accent: 'gold', align: 'right' },
     { title: 'New Games Weekly', text: 'Fresh games, new experiences every week.', icon: Sparkles, color: 'from-cyan-500/20 to-blue-500/5', background: '/new-games-banner.png', accent: 'cyan', align: 'left' },
     { title: 'Free-to-Play', text: 'Play your favorite games with GC & SC', icon: Zap, color: 'from-amber-500/20 to-orange-500/5', background: '/free-to-play-banner.png', accent: 'gold', align: 'right' },
