@@ -154,7 +154,7 @@ function Sidebar() {
   const [active, setActive] = useState('Home')
 
   return (
-    <aside className="fixed bottom-0 left-0 top-[80px] z-20 flex w-[264px] flex-col border-r border-white/[.08] bg-[#08051A] px-3 py-6 max-h-[calc(100vh-80px)] overflow-y-auto">
+    <aside className="fixed bottom-0 left-0 top-[68px] z-20 flex w-[264px] flex-col border-r border-white/[.08] bg-[#08051A] px-3 py-6 max-h-[calc(100vh-68px)] overflow-y-auto">
       <div className="flex flex-col gap-[3px]">
         {navPrimary.map(item => (
           <NavItem key={item.label} item={item} active={active === item.label} onSelect={() => setActive(item.label)} />
@@ -659,7 +659,7 @@ function GameCard({ game }: { game: Game }) {
   )
 }
 
-function MobileHeader() { return <header className="sticky top-4 z-40 flex items-center justify-between border-b border-white/10 bg-[#08051A]/95 px-4 py-3 backdrop-blur-xl"><LuckyRushLogo height={36} className="h-9 w-[107px]" /><div className="flex items-center gap-1.5"><div className="rounded-lg border border-amber-400/20 bg-amber-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-amber-300">GC</span> 25,600</div><div className="rounded-lg border border-emerald-400/20 bg-emerald-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-emerald-300">SC</span> 12.50</div><button aria-label="Notifications" className="flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[.04] text-slate-300"><Bell className="size-4" /></button></div></header> }
+function MobileHeader() { return <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[#08051A]/95 px-4 py-3 backdrop-blur-xl"><LuckyRushLogo height={36} className="h-9 w-[107px]" /><div className="flex items-center gap-1.5"><div className="rounded-lg border border-amber-400/20 bg-amber-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-amber-300">GC</span> 25,600</div><div className="rounded-lg border border-emerald-400/20 bg-emerald-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-emerald-300">SC</span> 12.50</div><button aria-label="Notifications" className="flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[.04] text-slate-300"><Bell className="size-4" /></button></div></header> }
 
 function MobileQuickNav() { const items = [{ label: 'Home', icon: Home, color: 'text-fuchsia-400' }, { label: 'Slots', icon: Zap, color: 'text-amber-400' }, { label: 'Live Casino', icon: Sparkles, color: 'text-cyan-400' }, { label: 'Table Games', icon: Trophy, color: 'text-yellow-400' }, { label: 'Promotions', icon: Gift, color: 'text-pink-400' }, { label: 'Search', icon: Search, color: 'text-slate-400' }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon, color }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-bold transition-all duration-300', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white shadow-[0_0_15px_rgba(217,70,239,.25)]' : 'border-white/10 bg-white/[.03] text-slate-400 hover:border-white/20 hover:bg-white/[.06]')}><Icon className={cn('size-5', index === 0 ? 'text-fuchsia-300 drop-shadow-[0_0_8px_rgba(217,70,239,.5)]' : color)} />{label}</button>)}</nav> }
 
@@ -776,9 +776,56 @@ function MobilePromos() {
 
 function MobileGameSection({ title, games: sectionGames }: { title: string; games: Game[] }) { return <section className="flex flex-col gap-3"><div className="flex items-center justify-between px-4"><h2 className="text-lg font-bold text-white">{title}</h2><button className="text-[11px] font-bold text-fuchsia-300">View All</button></div><div className="flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{sectionGames.map(game => <div key={game.name} className="w-[142px] shrink-0"><GameCard game={game} /></div>)}</div></section> }
 
-function MobileBottomNav() { const items = [{ label: 'Home', icon: Home, color: 'text-fuchsia-400' }, { label: 'Games', icon: LayoutGrid, color: 'text-cyan-400' }, { label: 'Rewards', icon: Crown, color: 'text-amber-400' }, { label: 'Promotions', icon: Gift, color: 'text-pink-400' }, { label: 'More', icon: Menu, color: 'text-slate-400' }]; return <nav className="fixed inset-x-0 bottom-0 z-50 flex h-[68px] items-end justify-around border-t border-white/10 bg-[#08051A]/95 px-2 pb-2 pt-1 backdrop-blur-xl">{items.map(({ label, icon: Icon, color }, i) => <button key={label} className={cn('flex min-w-[56px] flex-col items-center gap-1 rounded-xl px-2 py-1 text-[10px] font-bold transition-all duration-300', i === 2 ? 'bg-gradient-to-t from-fuchsia-600 to-violet-600 text-white shadow-[0_0_20px_rgba(217,70,239,.45)]' : 'text-slate-500 hover:text-slate-300')}><Icon className={cn('size-5', i === 2 ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,.3)]' : color)} />{label}</button>)}</nav> }
+function MobileBottomNav({ activeTab, setActiveTab }: { activeTab: string; setActiveTab: (tab: string) => void }) {
+  const items = [
+    { label: 'Home', icon: Home, color: 'text-fuchsia-400' },
+    { label: 'Games', icon: LayoutGrid, color: 'text-cyan-400' },
+    { label: 'Rewards', icon: Crown, color: 'text-amber-400' },
+    { label: 'Promotions', icon: Gift, color: 'text-pink-400' },
+    { label: 'More', icon: Menu, color: 'text-slate-400' }
+  ]
 
-function MobileLobby() { return <div className="flex flex-col gap-5 pb-24 md:hidden"><MobileHeader /><MobileHero /><MobileQuickNav /><MobilePromos /><div className="px-8"><p className="mb-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p><LuckyMatchGame /></div><MobileGameSection title="Popular Games" games={games.slice(0, 6)} /><MobileGameSection title="Featured Slots" games={games.slice(6, 12)} /><MobileGameSection title="Live Casino" games={games.slice(2, 8)} /><MobileBottomNav /></div> }
+  return (
+    <nav className="fixed inset-x-0 bottom-0 z-50 flex h-[68px] items-end justify-around border-t border-white/10 bg-[#08051A]/95 px-2 pb-2 pt-1 backdrop-blur-xl">
+      {items.map(({ label, icon: Icon, color }) => (
+        <button
+          key={label}
+          onClick={() => setActiveTab(label)}
+          className={cn(
+            'flex min-w-[56px] flex-col items-center gap-1 rounded-xl px-2 py-1 text-[10px] font-bold transition-all duration-300',
+            activeTab === label
+              ? 'bg-gradient-to-t from-fuchsia-600 to-violet-600 text-white shadow-[0_0_20px_rgba(217,70,239,.45)]'
+              : 'text-slate-500 hover:text-slate-300'
+          )}
+        >
+          <Icon className={cn('size-5', activeTab === label ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,.3)]' : color)} />
+          {label}
+        </button>
+      ))}
+    </nav>
+  )
+}
+
+function MobileLobby() {
+  const [activeTab, setActiveTab] = useState('Home')
+
+  return (
+    <div className="flex flex-col gap-5 pb-24 md:hidden">
+      <MobileHeader />
+      <MobileHero />
+      <MobileQuickNav />
+      <MobilePromos />
+      <div className="px-8">
+        <p className="mb-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p>
+        <LuckyMatchGame />
+      </div>
+      <MobileGameSection title="Popular Games" games={games.slice(0, 6)} />
+      <MobileGameSection title="Featured Slots" games={games.slice(6, 12)} />
+      <MobileGameSection title="Live Casino" games={games.slice(2, 8)} />
+      <MobileBottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
+    </div>
+  )
+}
 
 export default function Page() {
   const [filter, setFilter] = useState('For You')
@@ -874,15 +921,15 @@ export default function Page() {
         <Sidebar />
 
         {/* RIGHT SIDEBAR - FIXED */}
-        <aside className="fixed bottom-0 right-0 top-[80px] z-20 flex w-[280px] flex-col border-l border-white/[.08] bg-[#08051A] px-3 lg:w-[295px] xl:w-[315px] 2xl:w-[335px] max-h-[calc(100vh-80px)] overflow-y-auto">
+        <aside className="fixed bottom-0 right-0 top-[68px] z-20 flex w-[280px] flex-col border-l border-white/[.08] bg-[#08051A] px-3 lg:w-[295px] xl:w-[315px] 2xl:w-[335px] max-h-[calc(100vh-68px)] overflow-y-auto">
           <div className="flex flex-col gap-4">
             <LatestWins />
             <MiniGameCenter />
           </div>
         </aside>
 
-        <div className="ml-[264px] mr-[280px] h-screen pt-[80px] lg:mr-[295px] xl:mr-[315px] 2xl:mr-[335px]">
-          <div className="flex h-[calc(100vh-80px)] w-full flex-col px-4 py-4 xl:px-6 xl:py-5 overflow-y-auto">
+        <div className="ml-[264px] mr-[280px] h-screen pt-[68px] lg:mr-[295px] xl:mr-[315px] 2xl:mr-[335px]">
+          <div className="flex h-[calc(100vh-68px)] w-full flex-col px-4 py-4 xl:px-6 xl:py-5 overflow-y-auto">
 
             {/* ================================================= */}
             {/* MAIN CONTENT */}

@@ -33,9 +33,6 @@ export default function SparkleCursor() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    // Disable on touch devices
-    if (window.matchMedia("(pointer: coarse)").matches) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
@@ -80,7 +77,7 @@ export default function SparkleCursor() {
       });
     };
 
-    const handleMove = (e: MouseEvent) => {
+    const handleMove = (e: PointerEvent) => {
       mouse.current.x = e.clientX;
       mouse.current.y = e.clientY;
 
@@ -100,7 +97,7 @@ export default function SparkleCursor() {
       }
     };
 
-    const handleClick = (e: MouseEvent) => {
+    const handleClick = (e: PointerEvent) => {
       // Strong sparkle burst
       for (let i = 0; i < 28; i++) {
         createParticle(e.clientX, e.clientY, true);
@@ -119,7 +116,7 @@ export default function SparkleCursor() {
       }
     };
 
-    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("pointermove", handleMove);
     window.addEventListener("click", handleClick);
 
     const drawStar = (
@@ -221,7 +218,7 @@ export default function SparkleCursor() {
 
     return () => {
       window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMove);
+      window.removeEventListener("pointermove", handleMove);
       window.removeEventListener("click", handleClick);
 
       if (animationFrame.current) {

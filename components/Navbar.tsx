@@ -1,7 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { Bell, Home, Plus, Search } from 'lucide-react'
+import { Bell, Home, Plus, Search, Menu, X } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useState, useRef, useEffect } from 'react'
 
@@ -255,12 +256,14 @@ function JoinNowButton() {
 }
 
 export function Navbar() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
   return (
     <header
       className="
         fixed
         inset-x-0
-        top-2
+        top-0
         z-30
         h-auto
         border-b
@@ -450,6 +453,38 @@ export function Navbar() {
         {/* SPACER */}
         <div className="min-w-1 flex-1" />
 
+        {/* MOBILE MENU BUTTON */}
+        <button
+          type="button"
+          aria-label="Menu"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="
+            relative
+            flex
+            size-[42px]
+            shrink-0
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-[#292642]
+            bg-[#0C0A20]
+            text-[#A9A8BB]
+            transition-all
+            duration-300
+            hover:border-violet-400/40
+            hover:bg-violet-500/[.08]
+            hover:text-white
+            lg:hidden
+          "
+        >
+          {mobileMenuOpen ? (
+            <X className="size-[18px]" strokeWidth={2} />
+          ) : (
+            <Menu className="size-[18px]" strokeWidth={2} />
+          )}
+        </button>
+
         {/* RIGHT SIDE */}
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
 
@@ -618,58 +653,67 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* MOBILE NAV */}
-      <div
-        className="
-          flex
-          w-full
-          items-center
-          gap-1
-          overflow-x-auto
-          border-t
-          border-[#24213B]
-          px-3
-          py-2
-          scrollbar-none
-          lg:hidden
-        "
-      >
-        {navItems.map((item) => (
-          <a
-            key={item.label}
-            href={item.href}
-            className={cn(
-              `
-                shrink-0
-                rounded-full
-                px-3
-                py-1.5
-                text-[11px]
-                font-semibold
-                transition-all
-              `,
-              item.active
-                ? `
-                  border
-                  border-[#B84DFF]/45
-                  bg-gradient-to-r
-                  from-[#8F32E8]
-                  to-[#6523B7]
-                  text-white
-                  shadow-[0_0_12px_rgba(153,51,238,.22)]
-                `
-                : `
-                  border
-                  border-[#292642]
-                  bg-[#0C0A20]
-                  text-[#A9A8BB]
-                `
-            )}
+      {/* MOBILE MENU */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+            className="
+              lg:hidden
+              overflow-hidden
+              border-t
+              border-[#24213B]
+              bg-[#0A081E]
+            "
           >
-            {item.label}
-          </a>
-        ))}
-      </div>
+            <div className="flex flex-col gap-1 p-3">
+              {navItems.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    `
+                      flex
+                      h-[48px]
+                      items-center
+                      justify-center
+                      rounded-[12px]
+                      text-[14px]
+                      font-semibold
+                      transition-all
+                    `,
+                    item.active
+                      ? `
+                        border
+                        border-[#B84DFF]/45
+                        bg-gradient-to-r
+                        from-[#8F32E8]
+                        via-[#6523B7]
+                        to-[#32145F]
+                        text-white
+                        shadow-[0_0_16px_rgba(153,51,238,.28)]
+                      `
+                      : `
+                        border
+                        border-[#292642]
+                        bg-[#0C0A20]
+                        text-[#A9A8BB]
+                        hover:bg-white/[0.035]
+                        hover:text-white
+                      `
+                  )}
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }
