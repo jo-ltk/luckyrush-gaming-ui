@@ -1,6 +1,15 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import { Fredoka } from 'next/font/google'
 import './globals.css'
+import SparkleCursor from '@/components/SparkleCursor'
+
+const fredoka = Fredoka({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-fredoka',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'LuckyRush — Play. Spin. Get Rewarded.',
@@ -39,8 +48,17 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased">
+    <html lang="en" className={fredoka.variable}>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className={`${fredoka.variable} font-sans antialiased`}>
+        <SparkleCursor />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

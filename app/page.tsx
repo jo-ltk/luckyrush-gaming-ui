@@ -43,6 +43,8 @@ const wins = [
   { user: 'SpinMaster', amount: '+75,000 GC', time: '8 min ago', avatar: '/win-spin-master.png' },
   { user: 'QueenBee', amount: '+500 SC', time: '12 min ago', avatar: '/win-queen-bee.png' },
   { user: 'GameKing', amount: '+320,000 GC', time: '15 min ago', avatar: '/win-game-king.png' },
+  { user: 'MoonlightWolf', amount: '+185,000 GC', time: '18 min ago', avatar: '/moonlit-wolf-wins.png' },
+  { user: 'GoldenDragon', amount: '+2,400 SC', time: '21 min ago', avatar: '/golden-safari-lion-jackpot.png' },
 ]
 
 function NavItem({
@@ -64,7 +66,7 @@ function NavItem({
       whileTap={{ scale: 0.985 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
       className={cn(
-        'group relative flex h-[58px] w-full cursor-pointer items-center gap-[22px] rounded-[14px] px-[22px] text-left text-[15px] font-semibold transition-all duration-300',
+        'group relative flex h-[58px] w-full cursor-pointer items-center gap-[22px] rounded-[14px] px-[22px] text-left text-[15px] font-bold transition-all duration-300',
         active && 'overflow-hidden border border-[#B84DFF]/55 bg-gradient-to-r from-[#8F32E8] via-[#6523B7] to-[#32145F] text-white shadow-[0_0_18px_rgba(153,51,238,.28)]',
         !active && 'border border-transparent text-[#A9A9BC] hover:bg-white/[0.035] hover:text-[#E8E4F3]',
       )}
@@ -152,7 +154,7 @@ function Hero() {
         <p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.25em] text-fuchsia-300">
           <Sparkles className="size-3" /> Your lucky era starts here
         </p>
-        <h1 className="max-w-[300px] text-[42px] font-black leading-[.94] tracking-tight text-white">
+        <h1 className="max-w-[300px] text-[42px] font-bold leading-[.94] tracking-tight text-white">
           PLAY. SPIN.<br />
           <span className="bg-gradient-to-r from-fuchsia-300 via-pink-400 to-amber-300 bg-clip-text text-transparent">GET REWARDED.</span>
         </h1>
@@ -172,7 +174,7 @@ function Hero() {
               px-5
               py-3
               text-[10px]
-              font-black
+              font-bold
               uppercase
               tracking-widest
               text-white
@@ -184,7 +186,7 @@ function Hero() {
           >
             Play Now
           </button>
-          <button className="rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur">
+          <button className="rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur">
             View Games
           </button>
         </div>
@@ -193,7 +195,38 @@ function Hero() {
   )
 }
 
-function LatestWins() { return <motion.section initial={{ opacity: 0, x: 18 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.45, delay: 0.18 }} className="self-start rounded-2xl border border-white/[.08] bg-white/[.035] p-4"><div className="mb-4 flex items-center justify-between"><div><p className="text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Live activity</p><h2 className="mt-1 text-base font-bold text-white">Latest Wins</h2></div><button className="text-[11px] font-semibold text-slate-500 hover:text-fuchsia-300">View All</button></div><div className="flex flex-col gap-2.5">{wins.map(({ user, amount, time, avatar }) => <div key={user} className="flex items-center gap-2.5 rounded-xl border border-white/[.05] bg-black/20 p-2"><div className="relative size-9 shrink-0 overflow-hidden rounded-lg"><Image src={avatar} alt="" fill className="object-cover" /></div><div className="min-w-0 flex-1"><p className="truncate text-[11px] font-semibold text-white">{user}</p><p className="text-[10px] font-bold text-amber-300">{amount}</p></div><p className="self-start pt-0.5 text-[9px] text-slate-600">{time}</p></div>)}</div></motion.section> }
+function LatestWins() {
+  return (
+    <motion.section
+      initial={{ opacity: 0, x: 18 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.45, delay: 0.18 }}
+      className="w-full rounded-2xl border border-white/[.08] bg-white/[.035] p-4"
+    >
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Live activity</p>
+          <h2 className="mt-1 text-base font-bold text-white">Latest Wins</h2>
+        </div>
+        <button className="text-[11px] font-bold text-slate-500 hover:text-fuchsia-300">View All</button>
+      </div>
+      <div className="flex flex-col gap-2.5">
+        {wins.map(({ user, amount, time, avatar }) => (
+          <div key={user} className="flex items-center gap-2.5 rounded-xl border border-white/[.05] bg-black/20 p-2">
+            <div className="relative size-9 shrink-0 overflow-hidden rounded-lg">
+              <Image src={avatar} alt="" fill className="object-cover" />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-[11px] font-semibold text-white">{user}</p>
+              <p className="text-[10px] font-bold text-amber-300">{amount}</p>
+            </div>
+            <p className="self-start pt-0.5 text-[9px] text-slate-600">{time}</p>
+          </div>
+        ))}
+      </div>
+    </motion.section>
+  )
+}
 
 function MiniGameCenter() {
   return (
@@ -201,10 +234,10 @@ function MiniGameCenter() {
       initial={{ opacity: 0, x: 18 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.45, delay: 0.24 }}
-      className="w-full"
+      className="flex min-h-0 w-full flex-1 flex-col"
     >
       <p className="mb-1 px-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p>
-      <LuckyMatchGame />
+      <LuckyMatchGame className="flex-1" />
     </motion.section>
   )
 }
@@ -282,14 +315,14 @@ function GameCard({ game }: { game: Game }) {
           <>
             <div className="absolute inset-0 bg-[radial-gradient(circle_at_25%_15%,rgba(255,255,255,.4),transparent_18%),radial-gradient(circle_at_80%_80%,rgba(0,0,0,.5),transparent_55%)]" />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-4xl font-black text-white/90 drop-shadow-[0_3px_6px_rgba(0,0,0,.5)]">{game.icon}</span>
-              <span className="mt-2 max-w-[90%] text-center text-sm font-black uppercase leading-none tracking-tight text-white drop-shadow-lg">{game.name}</span>
+              <span className="text-4xl font-bold text-white/90 drop-shadow-[0_3px_6px_rgba(0,0,0,.5)]">{game.icon}</span>
+              <span className="mt-2 max-w-[90%] text-center text-sm font-bold uppercase leading-none tracking-tight text-white drop-shadow-lg">{game.name}</span>
               <span className="mt-1 text-[8px] font-bold uppercase tracking-[.3em] text-white/70">LuckyRush Original</span>
             </div>
           </>
         )}
         {game.badge && (
-          <span className={cn('absolute left-2 top-2 rounded-md px-1.5 py-1 text-[8px] font-black tracking-wider text-white', game.badge === 'NEW' ? 'bg-[#FF20E8] shadow-[0_0_14px_rgba(255,32,232,.4)]' : 'bg-[#6D19FF] shadow-[0_0_14px_rgba(109,25,255,.4)]')}>
+          <span className={cn('absolute left-2 top-2 rounded-md px-1.5 py-1 text-[8px] font-bold tracking-wider text-white', game.badge === 'NEW' ? 'bg-[#FF20E8] shadow-[0_0_14px_rgba(255,32,232,.4)]' : 'bg-[#6D19FF] shadow-[0_0_14px_rgba(109,25,255,.4)]')}>
             {game.badge}
           </span>
         )}
@@ -297,7 +330,7 @@ function GameCard({ game }: { game: Game }) {
           <Heart className="size-3.5" />
         </button>
       </div>
-      <p className="mt-2 truncate text-[11px] font-semibold text-slate-300">{game.name}</p>
+      <p className="mt-2 truncate text-[11px] font-bold text-slate-300">{game.name}</p>
       <p className="mt-0.5 text-[9px] uppercase tracking-wider text-slate-600">Slots · Play now</p>
     </motion.article>
   )
@@ -305,9 +338,9 @@ function GameCard({ game }: { game: Game }) {
 
 function MobileHeader() { return <header className="sticky top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[#08051A]/95 px-4 py-3 backdrop-blur-xl"><LuckyRushLogo height={36} className="h-9 w-[107px]" /><div className="flex items-center gap-1.5"><div className="rounded-lg border border-amber-400/20 bg-amber-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-amber-300">GC</span> 25,600</div><div className="rounded-lg border border-emerald-400/20 bg-emerald-400/[.06] px-2 py-1 text-[10px] font-bold text-white"><span className="text-emerald-300">SC</span> 12.50</div><button aria-label="Notifications" className="flex size-8 items-center justify-center rounded-lg border border-white/10 bg-white/[.04] text-slate-300"><Bell className="size-4" /></button></div></header> }
 
-function MobileQuickNav() { const items = [{ label: 'Home', icon: Home }, { label: 'Slots', icon: Zap }, { label: 'Live Casino', icon: Sparkles }, { label: 'Table Games', icon: Trophy }, { label: 'Promotions', icon: Gift }, { label: 'Search', icon: Search }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-semibold', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white' : 'border-white/10 bg-white/[.03] text-slate-400')}><Icon className="size-5" />{label}</button>)}</nav> }
+function MobileQuickNav() { const items = [{ label: 'Home', icon: Home }, { label: 'Slots', icon: Zap }, { label: 'Live Casino', icon: Sparkles }, { label: 'Table Games', icon: Trophy }, { label: 'Promotions', icon: Gift }, { label: 'Search', icon: Search }]; return <nav aria-label="Quick navigation" className="flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{items.map(({ label, icon: Icon }, index) => <button key={label} className={cn('flex min-w-[72px] shrink-0 flex-col items-center gap-1.5 rounded-xl border px-3 py-2.5 text-[10px] font-bold', index === 0 ? 'border-fuchsia-400/50 bg-fuchsia-500/15 text-white' : 'border-white/10 bg-white/[.03] text-slate-400')}><Icon className="size-5" />{label}</button>)}</nav> }
 
-function MobileHero() { return <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="relative mx-4 min-h-[220px] overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#160c32]"><Image src="/luckyrush-hero.png" alt="Neon casino jackpot night with Miami skyline, slot machine, and gold coins" fill className="object-cover object-[72%_center] opacity-90" priority /><div className="absolute inset-0 bg-gradient-to-r from-[#110b27] via-[#1a0e3b]/80 to-transparent" /><div className="relative z-10 flex min-h-[220px] flex-col justify-center px-5 py-6"><p className="text-[9px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Your lucky era starts here</p><h1 className="mt-2 text-[32px] font-black leading-[.94] tracking-tight text-white">PLAY. SPIN.<br /><span className="bg-gradient-to-r from-fuchsia-300 via-pink-400 to-amber-300 bg-clip-text text-transparent">GET REWARDED.</span></h1><p className="mt-2 max-w-[180px] text-[11px] leading-4 text-slate-300">Thousands of games. Daily rewards.</p><button className="mt-4 w-fit rounded-lg bg-gradient-to-r from-fuchsia-500 to-pink-500 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg">Play Now <ChevronRight className="ml-1 inline size-3" /></button></div><div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5"><span className="h-1.5 w-5 rounded-full bg-fuchsia-400" /><span className="size-1.5 rounded-full bg-white/40" /><span className="size-1.5 rounded-full bg-white/40" /></div></motion.section> }
+function MobileHero() { return <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="relative mx-4 min-h-[220px] overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#160c32]"><Image src="/luckyrush-hero.png" alt="Neon casino jackpot night with Miami skyline, slot machine, and gold coins" fill className="object-cover object-[72%_center] opacity-90" priority /><div className="absolute inset-0 bg-gradient-to-r from-[#110b27] via-[#1a0e3b]/80 to-transparent" /><div className="relative z-10 flex min-h-[220px] flex-col justify-center px-5 py-6"><p className="text-[9px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Your lucky era starts here</p><h1 className="mt-2 text-[32px] font-bold leading-[.94] tracking-tight text-white">PLAY. SPIN.<br /><span className="bg-gradient-to-r from-fuchsia-300 via-pink-400 to-amber-300 bg-clip-text text-transparent">GET REWARDED.</span></h1><p className="mt-2 max-w-[180px] text-[11px] leading-4 text-slate-300">Thousands of games. Daily rewards.</p><button className="mt-4 w-fit rounded-lg bg-gradient-to-r from-fuchsia-500 to-pink-500 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white shadow-lg">Play Now <ChevronRight className="ml-1 inline size-3" /></button></div><div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5"><span className="h-1.5 w-5 rounded-full bg-fuchsia-400" /><span className="size-1.5 rounded-full bg-white/40" /><span className="size-1.5 rounded-full bg-white/40" /></div></motion.section> }
 
 function MobilePromos() {
   const items = [
@@ -367,9 +400,9 @@ function MobilePromos() {
   )
 }
 
-function MobileGameSection({ title, games: sectionGames }: { title: string; games: Game[] }) { return <section className="flex flex-col gap-3"><div className="flex items-center justify-between px-4"><h2 className="text-lg font-bold text-white">{title}</h2><button className="text-[11px] font-semibold text-fuchsia-300">View All</button></div><div className="flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{sectionGames.map(game => <div key={game.name} className="w-[142px] shrink-0"><GameCard game={game} /></div>)}</div></section> }
+function MobileGameSection({ title, games: sectionGames }: { title: string; games: Game[] }) { return <section className="flex flex-col gap-3"><div className="flex items-center justify-between px-4"><h2 className="text-lg font-bold text-white">{title}</h2><button className="text-[11px] font-bold text-fuchsia-300">View All</button></div><div className="flex gap-3 overflow-x-auto px-4 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">{sectionGames.map(game => <div key={game.name} className="w-[142px] shrink-0"><GameCard game={game} /></div>)}</div></section> }
 
-function MobileBottomNav() { const items = [{ label: 'Home', icon: Home }, { label: 'Games', icon: LayoutGrid }, { label: 'Rewards', icon: Crown }, { label: 'Promotions', icon: Gift }, { label: 'More', icon: Menu }]; return <nav className="fixed inset-x-0 bottom-0 z-50 flex h-[68px] items-end justify-around border-t border-white/10 bg-[#08051A]/95 px-2 pb-2 pt-1 backdrop-blur-xl">{items.map(({ label, icon: Icon }, i) => <button key={label} className={cn('flex min-w-[56px] flex-col items-center gap-1 rounded-xl px-2 py-1 text-[10px] font-semibold', i === 2 ? 'bg-gradient-to-t from-fuchsia-600 to-violet-600 text-white shadow-[0_0_20px_rgba(217,70,239,.45)]' : 'text-slate-500')}><Icon className="size-5" />{label}</button>)}</nav> }
+function MobileBottomNav() { const items = [{ label: 'Home', icon: Home }, { label: 'Games', icon: LayoutGrid }, { label: 'Rewards', icon: Crown }, { label: 'Promotions', icon: Gift }, { label: 'More', icon: Menu }]; return <nav className="fixed inset-x-0 bottom-0 z-50 flex h-[68px] items-end justify-around border-t border-white/10 bg-[#08051A]/95 px-2 pb-2 pt-1 backdrop-blur-xl">{items.map(({ label, icon: Icon }, i) => <button key={label} className={cn('flex min-w-[56px] flex-col items-center gap-1 rounded-xl px-2 py-1 text-[10px] font-bold', i === 2 ? 'bg-gradient-to-t from-fuchsia-600 to-violet-600 text-white shadow-[0_0_20px_rgba(217,70,239,.45)]' : 'text-slate-500')}><Icon className="size-5" />{label}</button>)}</nav> }
 
 function MobileLobby() { return <div className="flex flex-col gap-5 pb-24 md:hidden"><MobileHeader /><MobileHero /><MobileQuickNav /><MobilePromos /><div className="px-8"><p className="mb-1 text-[10px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Mini Game Center</p><LuckyMatchGame /></div><MobileGameSection title="Popular Games" games={games.slice(0, 6)} /><MobileGameSection title="Featured Slots" games={games.slice(6, 12)} /><MobileGameSection title="Live Casino" games={games.slice(2, 8)} /><MobileBottomNav /></div> }
 
@@ -470,7 +503,7 @@ export default function Page() {
               {/* MAIN CONTENT */}
               {/* ================================================= */}
 
-              <div className="flex min-w-0 flex-col gap-5">
+              <div className="flex h-full min-w-0 flex-col gap-5">
 
                 {/* HERO */}
                 <Hero />
@@ -494,7 +527,7 @@ export default function Page() {
                             type="button"
                             onClick={() => setFilter(label)}
                             className={cn(
-                              'flex h-[38px] shrink-0 items-center gap-1.5 rounded-full px-[14px] text-[13px] font-semibold tracking-[-0.01em] transition-all duration-200',
+                              'flex h-[38px] shrink-0 items-center gap-1.5 rounded-full px-[14px] text-[13px] font-bold tracking-[-0.01em] transition-all duration-200',
                               active
                                 ? 'bg-gradient-to-r from-[#7B3CFF] via-[#9B45F0] to-[#C44BFF] text-white shadow-[0_0_18px_rgba(168,85,247,.38)]'
                                 : 'border border-white/[0.12] bg-[#16122C]/85 text-[#D4D0E4] hover:border-white/20 hover:bg-[#1C1836] hover:text-white',
@@ -512,7 +545,7 @@ export default function Page() {
 
                     <button
                       type="button"
-                      className="flex shrink-0 items-center gap-1 text-[13px] font-medium text-[#B7B3C9] transition-colors hover:text-white"
+                      className="flex shrink-0 items-center gap-1 text-[13px] font-bold text-[#B7B3C9] transition-colors hover:text-white"
                     >
                       View All Games
                       <ChevronRight className="size-4" />
@@ -540,7 +573,11 @@ export default function Page() {
                   className="
                     group
                     relative
-                    min-h-[150px]
+                    flex
+                    flex-1
+                    min-h-[220px]
+                    flex-col
+                    justify-center
                     overflow-hidden
                     rounded-[18px]
                     border
@@ -597,12 +634,15 @@ export default function Page() {
                       relative
                       z-10
                       flex
-                      min-h-[150px]
+                      h-full
+                      w-full
+                      min-h-[220px]
                       items-center
                       justify-between
                       gap-8
                       pl-[27%]
                       pr-6
+                      py-6
                     "
                   >
                     <div>
@@ -622,7 +662,7 @@ export default function Page() {
                         className="
                           mt-1
                           text-[25px]
-                          font-black
+                          font-bold
                           tracking-tight
                           text-white
                           drop-shadow-[0_2px_8px_rgba(0,0,0,.5)]
@@ -650,7 +690,7 @@ export default function Page() {
                     <div className="flex shrink-0 items-center gap-4">
 
                       <div className="text-center">
-                        <p className="text-[22px] font-black text-[#F5CB4E]">
+                        <p className="text-[22px] font-bold text-[#F5CB4E]">
                           100,000
                         </p>
 
@@ -673,7 +713,7 @@ export default function Page() {
                       </span>
 
                       <div className="text-center">
-                        <p className="text-[22px] font-black text-[#E678FF]">
+                        <p className="text-[22px] font-bold text-[#E678FF]">
                           10
                         </p>
 
@@ -704,7 +744,7 @@ export default function Page() {
                           to-[#D99A27]
                           px-5
                           text-[10px]
-                          font-black
+                          font-bold
                           uppercase
                           tracking-[.14em]
                           text-[#281900]
@@ -727,7 +767,7 @@ export default function Page() {
               {/* RIGHT SIDE — LATEST WINS */}
               {/* ================================================= */}
 
-              <aside className="flex min-w-0 flex-col gap-4">
+              <aside className="flex h-full min-w-0 flex-col gap-4">
                 <LatestWins />
                 <MiniGameCenter />
               </aside>

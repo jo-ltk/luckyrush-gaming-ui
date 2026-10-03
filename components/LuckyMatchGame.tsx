@@ -26,6 +26,8 @@ const RECENT_WINS = [
   { name: 'PlayfulTiger', amt: '+250,000 GC', color: 'text-yellow-300', time: '2 min ago', avatar: '/win-playful-tiger.png' },
   { name: 'LuckyStar88', amt: '+1,200 SC', color: 'text-green-400', time: '5 min ago', avatar: '/win-lucky-star.png' },
   { name: 'SpinMaster', amt: '+75,000 GC', color: 'text-yellow-300', time: '8 min ago', avatar: '/win-spin-master.png' },
+  { name: 'QueenBee', amt: '+500 SC', color: 'text-green-400', time: '12 min ago', avatar: '/win-queen-bee.png' },
+  { name: 'GameKing', amt: '+320,000 GC', color: 'text-yellow-300', time: '15 min ago', avatar: '/win-game-king.png' },
 ]
 
 const rand = () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]
@@ -203,8 +205,8 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
   const win = result === 'win'
 
   return (
-    <section className={`w-full ${className}`.trim()} aria-label="Lucky Match mini-game">
-      <div className="relative w-full" style={{ aspectRatio: '1065 / 1477' }}>
+    <section className={`flex h-full min-h-0 w-full flex-col ${className}`.trim()} aria-label="Lucky Match mini-game">
+      <div className="relative w-full shrink-0" style={{ aspectRatio: '1065 / 1477' }}>
         <div
           className="absolute overflow-hidden rounded-[12%]"
           style={{ left: '15.4%', width: '69.3%', top: '30.1%', height: '40.6%' }}
@@ -276,13 +278,13 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
                 <div className="text-[8px] font-bold tracking-[0.22em] text-fuchsia-200 drop-shadow-[0_1px_6px_rgba(0,0,0,.8)]">
                   MATCHED 3!
                 </div>
-                <div className="bg-gradient-to-b from-yellow-100 to-yellow-400 bg-clip-text text-[13px] font-black text-transparent drop-shadow-[0_0_10px_rgba(255,216,77,0.7)]">
+                <div className="bg-gradient-to-b from-yellow-100 to-yellow-400 bg-clip-text text-[13px] font-bold text-transparent drop-shadow-[0_0_10px_rgba(255,216,77,0.7)]">
                   {reward}
                 </div>
               </div>
             )}
             {result === 'lose' && (
-              <div className="lm-rise text-[11px] font-semibold text-white/70 drop-shadow-[0_1px_6px_rgba(0,0,0,.8)]">
+              <div className="lm-rise text-[11px] font-bold text-white/70 drop-shadow-[0_1px_6px_rgba(0,0,0,.8)]">
                 Try Again
               </div>
             )}
@@ -308,19 +310,19 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
         />
       </div>
 
-      <div className="relative z-20 mx-[2%] -mt-[16%] rounded-[18px] border border-indigo-400/45 bg-[#0A0624]/95 p-2.5 shadow-[0_8px_28px_rgba(0,0,0,0.45),0_0_18px_rgba(110,60,255,0.18)]">
+      <div className="relative z-20 mx-[2%] -mt-[16%] mb-0 flex min-h-0 flex-1 flex-col rounded-[18px] border border-indigo-400/45 bg-[#0A0624]/95 p-2.5 shadow-[0_8px_28px_rgba(0,0,0,0.45),0_0_18px_rgba(110,60,255,0.18)]">
         <div className="mb-2 flex items-center justify-between px-0.5">
-          <div className="flex items-center gap-1.5 text-[12px] font-extrabold tracking-wide text-[#F0C14B]">
+          <div className="flex items-center gap-1.5 text-[12px] font-bold tracking-wide text-[#F0C14B]">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
               <path d="M7 3h10v3h3v2a4 4 0 0 1-4 4h-.4A5 5 0 0 1 13 14.9V17h3v3H8v-3h3v-2.1A5 5 0 0 1 8.4 12H8a4 4 0 0 1-4-4V6h3V3Zm-1 5a2 2 0 0 0 1 1.7V8H6Zm12 0h-1v1.7A2 2 0 0 0 18 8Z" />
             </svg>
             RECENT WINS
           </div>
-          <button type="button" className="text-[11px] font-semibold text-[#C44BFF] hover:text-[#E678FF]">
+          <button type="button" className="text-[11px] font-bold text-[#C44BFF] hover:text-[#E678FF]">
             View All ›
           </button>
         </div>
-        <ul className="space-y-1.5">
+        <ul className="flex min-h-0 flex-1 flex-col justify-evenly gap-1.5">
           {RECENT_WINS.map((w) => (
             <li
               key={w.name}
@@ -329,10 +331,10 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
               <span className="relative size-8 shrink-0 overflow-hidden rounded-lg">
                 <Image src={w.avatar} alt="" fill className="object-cover" />
               </span>
-              <span className="min-w-0 flex-1 truncate text-left text-[12px] text-white/90">{w.name}</span>
+              <span className="min-w-0 flex-1 truncate text-left text-[12px] font-normal text-white/90">{w.name}</span>
               <span className="shrink-0 text-right">
-                <span className={`block text-[12px] font-extrabold leading-tight ${w.color}`}>{w.amt}</span>
-                <span className="mt-0.5 block text-[10px] leading-tight text-white/40">{w.time}</span>
+                <span className={`block text-[12px] font-bold leading-tight ${w.color}`}>{w.amt}</span>
+                <span className="mt-0.5 block text-[10px] font-normal leading-tight text-white/40">{w.time}</span>
               </span>
             </li>
           ))}

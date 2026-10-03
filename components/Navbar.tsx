@@ -82,7 +82,7 @@ function BalanceWidget({
           justify-center
           rounded-full
           text-[9px]
-          font-black
+          font-bold
           tracking-tight
           shadow-[inset_0_1px_1px_rgba(255,255,255,.45)]
           `,
@@ -93,7 +93,7 @@ function BalanceWidget({
       </div>
 
       {/* Balance */}
-      <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-[#E8E5F2]">
+      <span className="min-w-0 flex-1 truncate text-[13px] font-bold text-[#E8E5F2]">
         {amount}
       </span>
 
@@ -209,7 +209,7 @@ export function Navbar() {
                   via-[#6523B7]
                   to-[#32145F]
                   text-[14px]
-                  font-semibold
+                  font-bold
                   text-white
                   shadow-[0_0_16px_rgba(153,51,238,.28)]
                   transition-all
@@ -406,7 +406,7 @@ export function Navbar() {
               border-[#403667]
               bg-[#0C0A20]
               text-[13px]
-              font-semibold
+              font-bold
               text-[#D4D1DF]
               transition-all
               duration-300
