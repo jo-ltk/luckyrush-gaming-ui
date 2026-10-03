@@ -652,7 +652,7 @@ function PromoCard({ item }: { item: PromoItem }) {
     <div
       ref={cardRef}
       className={cn(
-        'group relative flex h-[100px] sm:h-[120px] items-start overflow-hidden rounded-xl border p-3 sm:p-4 transition-shadow hover:shadow-[0_8px_25px_rgba(168,85,247,.18)]',
+        'group relative flex min-h-[90px] md:min-h-[100px] lg:min-h-[120px] items-start overflow-hidden rounded-xl border p-2.5 md:p-3 lg:p-4 transition-shadow hover:shadow-[0_8px_25px_rgba(168,85,247,.18)]',
         item.background
           ? item.accent === 'cyan'
             ? 'border-cyan-300/40 hover:border-cyan-200/60'
@@ -701,8 +701,8 @@ function PromoCard({ item }: { item: PromoItem }) {
         </>
       )}
       <div className="relative z-10 flex w-full flex-col items-start">
-        <p className="text-xl sm:text-2xl md:text-3xl font-black leading-[0.92] tracking-tight text-white drop-shadow-[0_3px_5px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(191,126,255,0.4)]">{item.title}</p>
-        <p className={cn('mt-2 text-sm sm:text-lg leading-5', item.background ? 'text-white/90' : 'text-slate-400')}>{item.text}</p>
+        <p className="text-sm md:text-base lg:text-xl font-black leading-tight tracking-tight text-white drop-shadow-[0_3px_5px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(191,126,255,0.4)]">{item.title}</p>
+        <p className={cn('mt-1 text-[10px] md:text-[11px] lg:text-xs leading-[1.3] line-clamp-2', item.background ? 'text-white/90' : 'text-slate-400')}>{item.text}</p>
       </div>
     </div>
   )
@@ -716,7 +716,7 @@ function PromoCards() {
     { title: 'VIP Club', text: 'Unlock exclusive rewards and special perks', icon: Crown, color: 'from-yellow-500/20 to-amber-500/5', background: '/vip-club-golden-crown.png', accent: 'gold', align: 'right' },
   ]
   return (
-    <motion.div initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.18 } } }} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+    <motion.div initial="hidden" animate="show" variants={{ hidden: {}, show: { transition: { staggerChildren: 0.08, delayChildren: 0.18 } } }} className="grid grid-cols-2 md:grid-cols-4 gap-3">
       {items.map(item => (
         <motion.div
           key={item.title}
@@ -750,7 +750,7 @@ function GameCard({ game }: { game: Game }) {
         )}
         {game.badge && (
           <SparkleBadge
-            className={cn('absolute left-2 top-2 rounded-lg px-1.5 py-1 text-[8px] sm:px-3 sm:py-2 sm:text-[11px] font-bold tracking-wider text-white',
+            className={cn('absolute left-2 top-2 rounded-md px-1 py-0.5 text-[7px] xl:px-2.5 xl:py-1.5 xl:text-[10px] font-bold tracking-wider text-white',
               game.badge === 'NEW' ? 'bg-[#FF20E8] shadow-[0_0_18px_rgba(255,32,232,.6)]' :
               game.badge === 'EXCLUSIVE' ? 'bg-[#6D19FF] shadow-[0_0_18px_rgba(109,25,255,.6)]' :
               game.badge === 'HOT' ? 'bg-[#FF4500] shadow-[0_0_18px_rgba(255,69,0,.6)]' :
