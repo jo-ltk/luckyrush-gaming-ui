@@ -431,7 +431,7 @@ export default function Page() {
       className="
         relative
         min-h-screen
-        overflow-hidden
+        overflow-x-hidden
         bg-[#05040F]
         text-white
         selection:bg-violet-500/30
@@ -495,15 +495,15 @@ export default function Page() {
         <Navbar />
         <Sidebar />
 
-        <div className="ml-[264px] pt-[76px]">
-          <div className="mx-auto max-w-[1600px] px-6 py-6 xl:px-7">
-            <div className="grid grid-cols-[minmax(0,1fr)_292px] gap-5">
+        <div className="ml-[264px] min-h-screen pt-[76px]">
+          <div className="flex min-h-[calc(100vh-76px)] w-full flex-col px-4 py-4 xl:px-6 xl:py-5">
+            <div className="grid flex-1 grid-cols-[minmax(0,1fr)_280px] lg:grid-cols-[minmax(0,1fr)_295px] xl:grid-cols-[minmax(0,1fr)_315px] 2xl:grid-cols-[minmax(0,1fr)_335px] items-stretch gap-4 xl:gap-5">
 
               {/* ================================================= */}
               {/* MAIN CONTENT */}
               {/* ================================================= */}
 
-              <div className="flex h-full min-w-0 flex-col gap-5">
+              <div className="flex h-full min-w-0 flex-col justify-between gap-4 xl:gap-5">
 
                 {/* HERO */}
                 <Hero />
@@ -554,7 +554,7 @@ export default function Page() {
 
                   <motion.div
                     layout
-                    className="relative z-10 grid grid-cols-6 gap-x-3.5 gap-y-5"
+                    className="relative z-10 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 xl:gap-3.5"
                   >
                     {visible.map(game => (
                       <GameCard
@@ -767,7 +767,7 @@ export default function Page() {
               {/* RIGHT SIDE — LATEST WINS */}
               {/* ================================================= */}
 
-              <aside className="flex h-full min-w-0 flex-col gap-4">
+              <aside className="flex h-full min-w-0 flex-col justify-between gap-4 xl:gap-5">
                 <LatestWins />
                 <MiniGameCenter />
               </aside>
