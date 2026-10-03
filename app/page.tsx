@@ -11,6 +11,7 @@ import { LuckyMatchGame } from '@/components/LuckyMatchGame'
 import { LuckyRushLogo, Navbar } from '@/components/Navbar'
 import { SparkleBadge } from '@/components/SparkleBadge'
 import { FirstVisitPopups } from '@/components/FirstVisitPopups'
+import { Footer } from '@/components/Footer'
 import { cn } from '@/lib/utils'
 import {
   useLuckyRushAnimations,
@@ -928,14 +929,14 @@ export default function Page() {
           </div>
         </aside>
 
-        <div className="ml-[264px] mr-[280px] h-screen pt-[68px] lg:mr-[295px] xl:mr-[315px] 2xl:mr-[335px]">
+        <div className="ml-[264px] mr-[280px] min-h-screen pt-[68px] lg:mr-[295px] xl:mr-[315px] 2xl:mr-[335px]">
           <div className="flex h-[calc(100vh-68px)] w-full flex-col px-4 py-4 xl:px-6 xl:py-5 overflow-y-auto">
 
             {/* ================================================= */}
             {/* MAIN CONTENT */}
             {/* ================================================= */}
 
-            <div className="flex min-h-0 flex-1 flex-col justify-between gap-4 xl:gap-5">
+            <div className="flex flex-col gap-4 xl:gap-5">
 
               {/* HERO */}
               <Hero />
@@ -1009,7 +1010,6 @@ export default function Page() {
                   group
                   relative
                   flex
-                  flex-1
                   min-h-[140px]
                   sm:min-h-[165px]
                   flex-col
@@ -1102,7 +1102,7 @@ export default function Page() {
                       WELCOME BONUS
                     </h2>
 
-                   
+
 
                     <div className="mt-4 sm:mt-5 flex gap-2 sm:gap-3">
                       <button
@@ -1179,6 +1179,9 @@ export default function Page() {
             </div>
 
           </div>
+
+          {/* FOOTER */}
+          <Footer />
         </div>
       </div>
     </main>
