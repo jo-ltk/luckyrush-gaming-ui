@@ -1176,12 +1176,12 @@ export default function Page() {
                   </div>
                 </div>
               </section>
+
+              {/* FOOTER */}
+              <Footer />
             </div>
 
           </div>
-
-          {/* FOOTER */}
-          <Footer />
         </div>
       </div>
     </main>
