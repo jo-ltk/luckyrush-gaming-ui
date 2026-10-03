@@ -44,12 +44,84 @@ const wins = [
   { user: 'GameKing', amount: '+320,000 GC', time: '15 min ago', avatar: '/win-game-king.png' },
 ]
 
-function NavItem({ item, active = false }: { item: typeof navPrimary[number]; active?: boolean }) {
+function NavItem({
+  item,
+  active = false,
+  onSelect,
+}: {
+  item: typeof navPrimary[number]
+  active?: boolean
+  onSelect?: () => void
+}) {
   const Icon = item.icon
-  return <motion.button whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }} transition={{ duration: 0.22 }} className={cn('group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[13px] font-medium transition-all', active ? 'bg-gradient-to-r from-violet-600/80 to-fuchsia-600/70 text-white shadow-[0_0_22px_rgba(168,85,247,.3)] ring-1 ring-fuchsia-300/30' : 'text-slate-400 hover:bg-white/5 hover:text-white hover:shadow-[0_0_18px_rgba(168,85,247,.15)]')}><Icon className={cn('size-[17px] transition-transform duration-200 group-hover:scale-110', active ? 'text-fuchsia-100' : 'text-slate-500')} />{item.label}</motion.button>
+
+  return (
+    <motion.button
+      type="button"
+      onClick={onSelect}
+      whileHover={{ x: active ? 0 : 2 }}
+      whileTap={{ scale: 0.985 }}
+      transition={{ duration: 0.2, ease: 'easeOut' }}
+      className={cn(
+        'group relative flex h-[58px] w-full cursor-pointer items-center gap-[22px] rounded-[14px] px-[22px] text-left text-[15px] font-semibold transition-all duration-300',
+        active && 'overflow-hidden border border-[#B84DFF]/55 bg-gradient-to-r from-[#8F32E8] via-[#6523B7] to-[#32145F] text-white shadow-[0_0_18px_rgba(153,51,238,.28)]',
+        !active && 'border border-transparent text-[#A9A9BC] hover:bg-white/[0.035] hover:text-[#E8E4F3]',
+      )}
+    >
+      {active && (
+        <span
+          className="pointer-events-none absolute left-0 top-1/2 h-[42px] w-[3px] -translate-y-1/2 rounded-r-full bg-[#E765FF] shadow-[0_0_10px_3px_rgba(231,101,255,.65)]"
+        />
+      )}
+
+      {active && (
+        <span
+          className="pointer-events-none absolute inset-[1px] rounded-[13px] border border-white/[0.08]"
+        />
+      )}
+
+      <Icon
+        className={cn(
+          'relative z-10 size-[25px] shrink-0 transition-all duration-300',
+          active
+            ? 'text-[#F1B8FF] drop-shadow-[0_0_7px_rgba(235,130,255,.45)]'
+            : 'text-[#A7A8BA] group-hover:text-[#D7B7FF]',
+        )}
+        strokeWidth={active ? 2.2 : 1.8}
+      />
+
+      <span className="relative z-10">{item.label}</span>
+    </motion.button>
+  )
 }
 
-function Sidebar() { return <aside className="fixed bottom-0 left-0 top-[72px] z-20 flex w-[224px] flex-col border-r border-white/[.08] bg-[#08051A]/95 px-4 py-6 backdrop-blur-xl"><div className="flex flex-col gap-1">{navPrimary.map((item, i) => <NavItem key={item.label} item={item} active={i === 0} />)}</div><div className="my-5 h-px bg-white/[.08]" /><div className="flex flex-col gap-1">{navSecondary.map(item => <NavItem key={item.label} item={item} />)}</div><div className="relative mt-auto min-h-[210px] overflow-hidden rounded-2xl border border-fuchsia-400/20 bg-[#160d29] p-4 shadow-[0_0_28px_rgba(124,58,237,.16)]"><Image src="/vip-club-golden-crown.png" alt="" fill className="object-cover object-top" /><div className="relative z-10 flex h-full min-h-[178px] flex-col justify-end"><p className="text-sm font-semibold text-white drop-shadow-[0_1px_8px_rgba(0,0,0,.7)]">Join Our VIP Club</p><p className="mt-1 text-[11px] leading-4 text-violet-100/90">Unlock exclusive rewards and special perks!</p><button className="mt-3 flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-fuchsia-300">Learn More <ChevronRight className="size-3" /></button></div></div></aside> }
+function Sidebar() {
+  const [active, setActive] = useState('Home')
+
+  return (
+    <aside className="fixed bottom-0 left-0 top-[72px] z-20 flex w-[224px] flex-col border-r border-white/[.08] bg-[#08051A]/95 px-[12px] py-6 backdrop-blur-xl">
+      <div className="flex flex-col gap-[3px]">
+        {navPrimary.map(item => (
+          <NavItem key={item.label} item={item} active={active === item.label} onSelect={() => setActive(item.label)} />
+        ))}
+      </div>
+      <div className="my-5 h-px bg-white/[.08]" />
+      <div className="flex flex-col gap-[3px]">
+        {navSecondary.map(item => (
+          <NavItem key={item.label} item={item} active={active === item.label} onSelect={() => setActive(item.label)} />
+        ))}
+      </div>
+      <div className="relative mt-auto min-h-[210px] overflow-hidden rounded-2xl border border-fuchsia-400/20 bg-[#160d29] p-4 shadow-[0_0_28px_rgba(124,58,237,.16)]">
+        <Image src="/vip-club-golden-crown.png" alt="" fill className="object-cover object-top" />
+        <div className="relative z-10 flex h-full min-h-[178px] flex-col justify-end">
+          <p className="text-sm font-semibold text-white drop-shadow-[0_1px_8px_rgba(0,0,0,.7)]">Join Our VIP Club</p>
+          <p className="mt-1 text-[11px] leading-4 text-violet-100/90">Unlock exclusive rewards and special perks!</p>
+          <button type="button" className="mt-3 flex cursor-pointer items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-fuchsia-300 hover:text-fuchsia-200">Learn More <ChevronRight className="size-3" /></button>
+        </div>
+      </div>
+    </aside>
+  )
+}
 
 function Hero() { return <div className="relative min-h-[292px] overflow-hidden rounded-2xl border border-fuchsia-300/20 bg-[#160c32] shadow-[0_12px_50px_rgba(0,0,0,.25)]"><Image src="/luckyrush-hero.png" alt="Neon casino jackpot night with Miami skyline, slot machine, and gold coins" fill className="object-cover object-[72%_center] opacity-95" priority /><div className="absolute inset-0 bg-gradient-to-r from-[#110b27] via-[#1a0e3b]/70 to-transparent" /><div className="relative z-10 flex h-full min-h-[292px] flex-col justify-center px-9 py-8"><p className="mb-2 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[.25em] text-fuchsia-300"><Sparkles className="size-3" /> Your lucky era starts here</p><h1 className="max-w-[300px] text-[42px] font-black leading-[.94] tracking-tight text-white">PLAY. SPIN.<br /><span className="bg-gradient-to-r from-fuchsia-300 via-pink-400 to-amber-300 bg-clip-text text-transparent">GET REWARDED.</span></h1><p className="mt-3 max-w-[265px] text-xs leading-5 text-slate-300">Thousands of games. Daily rewards.<br />New favorites every week.</p><div className="mt-5 flex gap-2"><button className="rounded-lg bg-gradient-to-r from-fuchsia-500 to-pink-500 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white shadow-lg">Play Now</button><button className="rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-white backdrop-blur">View Games</button></div></div></div> }
 
