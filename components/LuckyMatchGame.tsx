@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from 'react'
 import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
+import { cn } from '@/lib/utils'
 
 type SymbolId = 'crown' | 'diamond' | 'gift' | 'seven' | 'star' | 'coin' | 'chest' | 'clover'
 const SYMBOLS: SymbolId[] = ['crown', 'diamond', 'gift', 'seven', 'star', 'coin', 'chest', 'clover']
@@ -22,13 +24,121 @@ const BASE_MS = 1900
 const STAGGER_MS = 500
 const VISIBLE = 5
 
-const RECENT_WINS = [
-  { name: 'PlayfulTiger', amt: '+250,000 GC', color: 'text-yellow-300', time: '2 min ago', avatar: '/win-playful-tiger.png' },
-  { name: 'LuckyStar88', amt: '+1,200 SC', color: 'text-green-400', time: '5 min ago', avatar: '/win-lucky-star.png' },
-  { name: 'SpinMaster', amt: '+75,000 GC', color: 'text-yellow-300', time: '8 min ago', avatar: '/win-spin-master.png' },
-  { name: 'QueenBee', amt: '+500 SC', color: 'text-green-400', time: '12 min ago', avatar: '/win-queen-bee.png' },
-  { name: 'GameKing', amt: '+320,000 GC', color: 'text-yellow-300', time: '15 min ago', avatar: '/win-game-king.png' },
+type RecentWin = {
+  id: string
+  name: string
+  amt: string
+  color: string
+  time: string
+  avatar: string
+}
+
+const RECENT_WINS: RecentWin[] = [
+  {
+    id: 'playful-tiger',
+    name: 'PlayfulTiger',
+    amt: '+250,000 GC',
+    color: 'text-yellow-300',
+    time: '2 min ago',
+    avatar: '/win-playful-tiger.png',
+  },
+  {
+    id: 'lucky-star',
+    name: 'LuckyStar88',
+    amt: '+1,200 SC',
+    color: 'text-green-400',
+    time: '5 min ago',
+    avatar: '/win-lucky-star.png',
+  },
+  {
+    id: 'spin-master',
+    name: 'SpinMaster',
+    amt: '+75,000 GC',
+    color: 'text-yellow-300',
+    time: '8 min ago',
+    avatar: '/win-spin-master.png',
+  },
+  {
+    id: 'queen-bee',
+    name: 'QueenBee',
+    amt: '+500 SC',
+    color: 'text-green-400',
+    time: '12 min ago',
+    avatar: '/win-queen-bee.png',
+  },
+  {
+    id: 'game-king',
+    name: 'GameKing',
+    amt: '+320,000 GC',
+    color: 'text-yellow-300',
+    time: '15 min ago',
+    avatar: '/win-game-king.png',
+  },
+  {
+    id: 'golden-dragon',
+    name: 'GoldenDragon',
+    amt: '+2,400 SC',
+    color: 'text-green-400',
+    time: '18 min ago',
+    avatar: '/golden-safari-lion-jackpot.png',
+  },
 ]
+
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3)
+}
+
+function AnimatedWinAmount({ amount, winId, isNew }: { amount: string; winId: string; isNew: boolean }) {
+  const [displayedAmount, setDisplayedAmount] = useState(amount)
+  const animatedIds = useRef<Set<string>>(new Set())
+  const lastUpdateTime = useRef(0)
+
+  useEffect(() => {
+    if (!isNew) {
+      setDisplayedAmount(amount)
+      return
+    }
+
+    if (animatedIds.current.has(winId)) {
+      setDisplayedAmount(amount)
+      return
+    }
+
+    const match = amount.match(/^([+])([\d,]+)\s*(GC|SC)$/)
+    if (!match) return
+
+    animatedIds.current.add(winId)
+    const [, prefix, numericStr, suffix] = match
+    const targetValue = parseInt(numericStr.replace(/,/g, ''), 10)
+    const startValue = 0
+    const duration = 600
+    const startTime = performance.now()
+    const throttleMs = 33
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const easedProgress = easeOutCubic(progress)
+      const currentValue = Math.floor(startValue + (targetValue - startValue) * easedProgress)
+      const formattedValue = currentValue.toLocaleString()
+
+      if (currentTime - lastUpdateTime.current > throttleMs) {
+        setDisplayedAmount(`${prefix}${formattedValue} ${suffix}`)
+        lastUpdateTime.current = currentTime
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      } else {
+        setDisplayedAmount(`${prefix}${formattedValue} ${suffix}`)
+      }
+    }
+
+    requestAnimationFrame(animate)
+  }, [amount, winId, isNew])
+
+  return <>{displayedAmount}</>
+}
 
 const rand = () => SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)]
 
@@ -154,10 +264,12 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
   const [reward, setReward] = useState<string | null>(null)
   const [particles, setParticles] = useState<Particle[]>([])
   const timers = useRef<number[]>([])
+  const autoSpinInterval = useRef<number | null>(null)
+  const [recentWins, setRecentWins] = useState<RecentWin[]>(RECENT_WINS)
   useEffect(() => () => timers.current.forEach(window.clearTimeout), [])
+  useEffect(() => () => { if (autoSpinInterval.current) window.clearInterval(autoSpinInterval.current) }, [])
 
   const spin = useCallback(() => {
-    if (spinning) return
     setSpinning(true)
     setResult(null)
     setReward(null)
@@ -200,7 +312,45 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
         }, BASE_MS + i * STAGGER_MS),
       )
     })
-  }, [spinning])
+  }, [])
+
+  useEffect(() => {
+    autoSpinInterval.current = window.setInterval(() => {
+      if (!spinning) {
+        spin()
+      }
+    }, 8000)
+    return () => { if (autoSpinInterval.current) window.clearInterval(autoSpinInterval.current) }
+  }, [spinning, spin])
+
+  useEffect(() => {
+    let timeout: number
+
+    const pushNewWin = () => {
+      setRecentWins(prev => {
+        const source = RECENT_WINS[
+          Math.floor(Math.random() * RECENT_WINS.length)
+        ]
+
+        const newWin: RecentWin = {
+          ...source,
+          id: `${source.name}-${Date.now()}`,
+          time: 'just now',
+        }
+
+        return [newWin, ...prev].slice(0, 6)
+      })
+
+      timeout = window.setTimeout(
+        pushNewWin,
+        2800 + Math.random() * 1800
+      )
+    }
+
+    timeout = window.setTimeout(pushNewWin, 3200)
+
+    return () => window.clearTimeout(timeout)
+  }, [])
 
   const win = result === 'win'
 
@@ -310,7 +460,7 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
         />
       </div>
 
-      <div className="relative z-20 mx-[2%] -mt-[16%] mb-0 flex min-h-0 flex-1 flex-col rounded-[18px] border border-indigo-400/45 bg-[#0A0624]/95 p-2.5 shadow-[0_8px_28px_rgba(0,0,0,0.45),0_0_18px_rgba(110,60,255,0.18)]">
+      <div className="relative z-20 mx-[2%] -mt-[16%] mb-0 flex h-[408px] flex-col rounded-[18px] border border-indigo-400/45 bg-[#0A0624]/95 p-2.5 shadow-[0_8px_28px_rgba(0,0,0,0.45),0_0_18px_rgba(110,60,255,0.18)] overflow-hidden">
         <div className="mb-2 flex items-center justify-between px-0.5">
           <div className="flex items-center gap-1.5 text-[12px] font-bold tracking-wide text-[#F0C14B]">
             <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
@@ -322,22 +472,56 @@ export function LuckyMatchGame({ className = '' }: { className?: string }) {
             View All ›
           </button>
         </div>
-        <ul className="flex min-h-0 flex-1 flex-col justify-evenly gap-1.5">
-          {RECENT_WINS.map((w) => (
-            <li
-              key={w.name}
-              className="flex items-center gap-2 rounded-[12px] border border-white/[0.07] bg-white/[0.035] px-2 py-1.5"
-            >
-              <span className="relative size-8 shrink-0 overflow-hidden rounded-lg">
-                <Image src={w.avatar} alt="" fill className="object-cover" />
-              </span>
-              <span className="min-w-0 flex-1 truncate text-left text-[12px] font-normal text-white/90">{w.name}</span>
-              <span className="shrink-0 text-right">
-                <span className={`block text-[12px] font-bold leading-tight ${w.color}`}>{w.amt}</span>
-                <span className="mt-0.5 block text-[10px] font-normal leading-tight text-white/40">{w.time}</span>
-              </span>
-            </li>
-          ))}
+        <ul className="flex min-h-0 flex-1 flex-col justify-evenly gap-1 overflow-hidden">
+          <AnimatePresence initial={false}>
+            {recentWins.map((w, index) => (
+              <motion.li
+                layout="position"
+                key={w.id}
+                initial={{
+                  opacity: 0,
+                  y: -45,
+                }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                }}
+                exit={{
+                  opacity: 0,
+                  y: 30,
+                }}
+                transition={{
+                  layout: {
+                    type: 'spring',
+                    stiffness: 700,
+                    damping: 40,
+                    mass: 0.35,
+                  },
+                  opacity: {
+                    duration: 0.32,
+                  },
+                  y: {
+                    type: 'spring',
+                    stiffness: 700,
+                    damping: 40,
+                    mass: 0.35,
+                  },
+                }}
+                className="flex items-center gap-2 rounded-[12px] border border-white/[0.07] bg-white/[0.035] px-2 py-2.5"
+              >
+                <span className="relative size-8 shrink-0 overflow-hidden rounded-lg">
+                  <Image src={w.avatar} alt="" fill className="object-cover" />
+                </span>
+                <span className="min-w-0 flex-1 truncate text-left text-[12px] font-normal text-white/90">{w.name}</span>
+                <span className="shrink-0 text-right">
+                  <span className={`block text-[12px] font-bold leading-tight ${w.color}`}>
+                    <AnimatedWinAmount amount={w.amt} winId={w.id} isNew={index === 0} />
+                  </span>
+                  <span className="mt-0.5 block text-[10px] font-normal leading-tight text-white/40">{w.time}</span>
+                </span>
+              </motion.li>
+            ))}
+          </AnimatePresence>
         </ul>
       </div>
 

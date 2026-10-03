@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
@@ -37,7 +37,74 @@ const games: Game[] = [
   { name: 'Dragon Gold', category: 'Jackpots', tags: ['Slots', 'Live Casino'], colors: 'from-red-700 via-orange-600 to-amber-950', icon: '♨', cover: '/dragon-gold-fiery-treasure-quest.png' },
   { name: 'Moonlight Wins', category: 'For You', tags: ['Slots', 'Table Games'], colors: 'from-indigo-500 via-violet-700 to-slate-950', icon: '☾', cover: '/moonlit-wolf-wins.png' },
 ]
-const wins = [
+type Win = {
+  user: string
+  amount: string
+  time: string
+  avatar: string
+}
+
+type DisplayWin = Win & {
+  id: string
+}
+
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3)
+}
+
+function AnimatedWinAmount({ amount, winId, isNew }: { amount: string; winId: string; isNew: boolean }) {
+  const [displayedAmount, setDisplayedAmount] = useState(amount)
+  const animatedIds = useRef<Set<string>>(new Set())
+  const lastUpdateTime = useRef(0)
+
+  useEffect(() => {
+    if (!isNew) {
+      setDisplayedAmount(amount)
+      return
+    }
+
+    if (animatedIds.current.has(winId)) {
+      setDisplayedAmount(amount)
+      return
+    }
+
+    const match = amount.match(/^([+])([\d,]+)\s*(GC|SC)$/)
+    if (!match) return
+
+    animatedIds.current.add(winId)
+    const [, prefix, numericStr, suffix] = match
+    const targetValue = parseInt(numericStr.replace(/,/g, ''), 10)
+    const startValue = 0
+    const duration = 600
+    const startTime = performance.now()
+    const throttleMs = 33
+
+    const animate = (currentTime: number) => {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const easedProgress = easeOutCubic(progress)
+      const currentValue = Math.floor(startValue + (targetValue - startValue) * easedProgress)
+      const formattedValue = currentValue.toLocaleString()
+
+      if (currentTime - lastUpdateTime.current > throttleMs) {
+        setDisplayedAmount(`${prefix}${formattedValue} ${suffix}`)
+        lastUpdateTime.current = currentTime
+      }
+
+      if (progress < 1) {
+        requestAnimationFrame(animate)
+      } else {
+        setDisplayedAmount(`${prefix}${formattedValue} ${suffix}`)
+      }
+    }
+
+    requestAnimationFrame(animate)
+  }, [amount, winId, isNew])
+
+  return <>{displayedAmount}</>
+}
+
+const wins: Win[] = [
   { user: 'PlayfulTiger', amount: '+250,000 GC', time: '2 min ago', avatar: '/win-playful-tiger.png' },
   { user: 'LuckyStar88', amount: '+1,200 SC', time: '5 min ago', avatar: '/win-lucky-star.png' },
   { user: 'SpinMaster', amount: '+75,000 GC', time: '8 min ago', avatar: '/win-spin-master.png' },
@@ -253,33 +320,147 @@ function Hero() {
 }
 
 function LatestWins() {
+  const [displayWins, setDisplayWins] = useState<DisplayWin[]>(() =>
+    wins.map((w, i) => ({ ...w, id: `${w.user}-${i}` }))
+  )
+
+  const nextIndex = useRef(0)
+
+  useEffect(() => {
+    let timeout: number
+
+    const addLiveWin = () => {
+      setDisplayWins(prev => {
+        const source = wins[nextIndex.current % wins.length]
+        nextIndex.current++
+
+        const newWin: DisplayWin = {
+          ...source,
+          id: `${source.user}-${Date.now()}`,
+          time: 'just now',
+        }
+
+        return [newWin, ...prev].slice(0, 7)
+      })
+
+      // Random 2.4–3.8 sec interval
+      timeout = window.setTimeout(addLiveWin, 2400 + Math.random() * 1400)
+    }
+
+    timeout = window.setTimeout(addLiveWin, 2800)
+
+    return () => window.clearTimeout(timeout)
+  }, [])
+
   return (
     <motion.section
       initial={{ opacity: 0, x: 18 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.45, delay: 0.18 }}
-      className="w-full rounded-2xl border border-white/[.08] bg-white/[.035] p-4"
+      className="w-full h-[458px] rounded-2xl border border-white/[.08] bg-white/[.035] p-4 overflow-hidden"
     >
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <p className="text-[14px] font-bold uppercase tracking-[.2em] text-fuchsia-300">Live activity</p>
-          <h2 className="mt-1 text-xl font-bold text-white">Latest Wins</h2>
+          <p className="text-[14px] font-bold uppercase tracking-[.2em] text-fuchsia-300">
+            Live activity
+          </p>
+
+          <h2 className="mt-1 text-xl font-bold text-white">
+            Latest Wins
+          </h2>
         </div>
-        <button className="text-[15px] font-bold text-slate-500 hover:text-fuchsia-300">View All</button>
+
+        <button className="text-[15px] font-bold text-slate-500 hover:text-fuchsia-300">
+          View All
+        </button>
       </div>
-      <div className="flex flex-col gap-2.5">
-        {wins.map(({ user, amount, time, avatar }) => (
-          <div key={user} className="flex items-center gap-2.5 rounded-xl border border-white/[.05] bg-black/20 p-2">
-            <div className="relative size-9 shrink-0 overflow-hidden rounded-lg">
-              <Image src={avatar} alt="" fill className="object-cover" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[15px] font-semibold text-white">{user}</p>
-              <p className="text-[14px] font-bold text-amber-300">{amount}</p>
-            </div>
-            <p className="self-start pt-0.5 text-[13px] text-slate-600">{time}</p>
-          </div>
-        ))}
+
+      <div className="flex flex-col gap-2.5 overflow-hidden">
+        <AnimatePresence initial={false}>
+          {displayWins.map((win: DisplayWin, index: number) => (
+            <motion.div
+              key={win.id}
+              layout="position"
+              initial={{
+                opacity: 0,
+                y: -45,
+              }}
+              animate={{
+                opacity: 1,
+                y: 0,
+              }}
+              exit={{
+                opacity: 0,
+                y: 30,
+              }}
+              transition={{
+                layout: {
+                  type: 'spring',
+                  stiffness: 700,
+                  damping: 40,
+                  mass: 0.35,
+                },
+                opacity: {
+                  duration: 0.32,
+                },
+                y: {
+                  type: 'spring',
+                  stiffness: 700,
+                  damping: 40,
+                  mass: 0.35,
+                },
+              }}
+              className={cn(
+                'relative flex items-center gap-2.5 rounded-xl border border-white/[.05] bg-black/20 p-2',
+                index === 0 &&
+                  'shadow-[0_0_18px_rgba(217,70,239,.12)]'
+              )}
+            >
+              {/* LIVE indicator on newest player */}
+              {index === 0 && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: [0.4, 1, 0.4], scale: [0.9, 1.15, 0.9] }}
+                  transition={{
+                    duration: 0.9,
+                    repeat: 2,
+                  }}
+                  className="absolute -left-1.5 top-1/2 size-2 -translate-y-1/2 rounded-full bg-fuchsia-400 shadow-[0_0_10px_3px_rgba(217,70,239,.55)]"
+                />
+              )}
+
+              <div className="relative size-9 shrink-0 overflow-hidden rounded-lg">
+                <Image
+                  src={win.avatar}
+                  alt=""
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[15px] font-semibold text-white">
+                  {win.user}
+                </p>
+
+                <p className="text-[14px] font-bold text-amber-300">
+                  <AnimatedWinAmount amount={win.amount} winId={win.id} isNew={index === 0} />
+                </p>
+              </div>
+
+              <p
+                className={cn(
+                  'self-start pt-0.5 text-[13px]',
+                  index === 0
+                    ? 'font-semibold text-fuchsia-300'
+                    : 'text-slate-600'
+                )}
+              >
+                {win.time}
+              </p>
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </motion.section>
   )
@@ -358,7 +539,7 @@ function PromoCards() {
 function GameCard({ game }: { game: Game }) {
   return (
     <motion.article initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.32 }} whileHover={{ y: -4 }} className="group relative min-w-0">
-      <div className={cn('relative aspect-[1.6/1] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br shadow-[0_10px_24px_rgba(0,0,0,.28)] transition duration-300 group-hover:shadow-[0_10px_28px_rgba(168,85,247,.3)]', game.colors)}>
+      <div className={cn('relative aspect-[1.4/1] overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br shadow-[0_10px_24px_rgba(0,0,0,.28)] transition duration-300 group-hover:shadow-[0_10px_28px_rgba(168,85,247,.3)]', game.colors)}>
         {game.cover ? (
           <Image src={game.cover} alt={game.name} fill className="object-cover" />
         ) : (
@@ -474,7 +655,10 @@ function WelcomeBonusBanner() {
           <span className="block bg-gradient-to-b from-[#FFFAD0] via-[#F5B520] to-[#994F00] bg-clip-text text-transparent drop-shadow-[0_3px_4px_rgba(0,0,0,0.95)] drop-shadow-[0_0_14px_rgba(245,181,32,0.4)] whitespace-nowrap">WELCOME BONUS</span>
         </h2>
         <p className="mt-2 max-w-[180px] text-[11px] leading-4 text-slate-300">Sign up now and get <strong className="text-[#F4C84E]">FREE COINS</strong> to start playing!</p>
-        <button className="mt-4 w-fit rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[#1a0a00] shadow-lg">Claim Reward <ChevronRight className="ml-1 inline size-3" /></button>
+        <div className="mt-4 flex gap-2">
+          <button className="rounded-lg bg-gradient-to-r from-amber-500 to-yellow-400 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-[#1a0a00] shadow-lg">Claim Reward</button>
+          <button className="rounded-lg border border-white/20 bg-white/10 px-4 py-2.5 text-[10px] font-bold uppercase tracking-widest text-white backdrop-blur">Learn More</button>
+        </div>
       </div>
       <div className="absolute bottom-3 left-1/2 flex -translate-x-1/2 gap-1.5">
         {heroSlides.map((_, i) => (
@@ -722,7 +906,7 @@ export default function Page() {
                     relative
                     flex
                     flex-1
-                    min-h-[220px]
+                    min-h-[165px]
                     flex-col
                     justify-center
                     overflow-hidden
@@ -783,83 +967,12 @@ export default function Page() {
                       flex
                       h-full
                       w-full
-                      min-h-[220px]
+                      min-h-[165px]
                       items-center
                       px-8
-                      py-6
+                      py-5
                     "
                   >
-                    {/* CENTERED BONUS BLOCK */}
-                    <div className="flex shrink-0 items-center gap-5 mx-auto">
-
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-[24px] font-bold text-[#F5CB4E] lg:text-[26px]">
-                          100,000
-                        </span>
-
-                        <span
-                          className="
-                            text-[9px]
-                            font-bold
-                            uppercase
-                            tracking-[.15em]
-                            text-white/60
-                          "
-                        >
-                          GC
-                        </span>
-                      </div>
-
-                      <span className="text-xl font-bold text-[#E99AFF]">
-                        +
-                      </span>
-
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-[24px] font-bold text-[#E678FF] lg:text-[26px]">
-                          10
-                        </span>
-
-                        <span
-                          className="
-                            text-[9px]
-                            font-bold
-                            uppercase
-                            tracking-[.15em]
-                            text-white/60
-                          "
-                        >
-                          SC
-                        </span>
-                      </div>
-
-                      <button
-                        type="button"
-                        className="
-                          h-[45px]
-                          rounded-[12px]
-                          border
-                          border-amber-300/30
-                          bg-gradient-to-r
-                          from-[#EBC44E]
-                          to-[#D99A27]
-                          px-5
-                          text-[10px]
-                          font-bold
-                          uppercase
-                          tracking-[.14em]
-                          text-[#281900]
-                          shadow-[0_0_18px_rgba(235,196,78,.18)]
-                          transition-all
-                          duration-300
-                          hover:brightness-110
-                          hover:shadow-[0_0_25px_rgba(235,196,78,.3)]
-                          active:scale-[.98]
-                        "
-                      >
-                        Claim Reward
-                      </button>
-                    </div>
-
                     {/* RIGHT CONTENT */}
                     <div className="flex flex-col items-end ml-auto">
                       <p
@@ -896,6 +1009,61 @@ export default function Page() {
                         </strong>{' '}
                         to start playing!
                       </p>
+
+                      <div className="mt-5 flex gap-3">
+                        <button
+                          type="button"
+                          className="
+                            flex
+                            h-[48px]
+                            items-center
+                            justify-center
+                            rounded-[12px]
+                            border
+                            border-amber-400/30
+                            bg-gradient-to-r
+                            from-amber-500
+                            to-yellow-400
+                            px-6
+                            text-[12px]
+                            font-bold
+                            uppercase
+                            tracking-widest
+                            text-[#1a0a00]
+                            shadow-[0_0_18px_rgba(251,191,36,.25)]
+                            transition-all
+                            hover:brightness-110
+                            hover:shadow-[0_0_25px_rgba(251,191,36,.38)]
+                          "
+                        >
+                          Claim Reward
+                        </button>
+                        <button
+                          type="button"
+                          className="
+                            flex
+                            h-[48px]
+                            items-center
+                            justify-center
+                            rounded-[12px]
+                            border
+                            border-white/20
+                            bg-white/10
+                            px-6
+                            text-[12px]
+                            font-bold
+                            uppercase
+                            tracking-widest
+                            text-white
+                            backdrop-blur
+                            transition-all
+                            hover:bg-white/15
+                            hover:border-white/30
+                          "
+                        >
+                          Learn More
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </section>
